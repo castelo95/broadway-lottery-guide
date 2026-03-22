@@ -76,7 +76,7 @@
 
   function runBroadwayDirect() {
     const ud = loadUser();
-    if (!ud.firstName || !ud.email) { showBanner('⚠️ Configura tus datos primero en bwayrush.com', '#ecc94b'); return; }
+    if (!ud.firstName || !ud.email) { showBanner('⚠️ Set up your data first at bwayrush.com', '#ecc94b'); return; }
     let completedCount = 0, currentIndex = 0, isProcessing = false;
 
     function getEnterNowButtons() {
@@ -158,7 +158,7 @@
       if (isProcessing) return;
       const buttons = getEnterNowButtons();
       if (currentIndex >= buttons.length || buttons.length === 0) {
-        if (completedCount > 0) showBanner(`<span style="color:#48bb78">✓ ${completedCount} postulación${completedCount>1?'es':''} enviada${completedCount>1?'s':''}.</span><div class="sub">Revisa tu email.</div>`, '#48bb78');
+        if (completedCount > 0) showBanner(`<span style="color:#48bb78">✓ ${completedCount} entr${completedCount>1?'ies':'y'} submitted.</span><div class="sub">Check your email for results.</div>`, '#48bb78');
         else showBanner(`No open "ENTER NOW" lotteries found.<div class="sub">All may be Closed/Upcoming or already entered.</div>`, '#ecc94b');
         return;
       }
@@ -173,7 +173,7 @@
           clearInterval(tryFill);
           setTimeout(() => {
             if (!hasPendingCaptcha()) {
-              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} — no captcha, sending...</span>${remaining>1?`<div class="sub">Quedan ${remaining-1} más</div>`:''}`, '#48bb78');
+              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} — no captcha, sending...</span>${remaining>1?`<div class="sub">${remaining-1} more to go</div>`:''}`, '#48bb78');
               setTimeout(() => { clickEnterButton(); completedCount++; currentIndex++; watchForSuccessOrClose(); }, 600);
             } else {
               showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} filled</span><div class="sub">👆 Solve reCAPTCHA → click ENTER${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#48bb78');
@@ -303,6 +303,7 @@
     function build() {
       const shows = scrapeShows();
       const selected = new Set();
+      let globalAuto = false; // global auto-submit toggle
       let filter = 'all';
 
       const fab = document.createElement('button');
@@ -471,23 +472,24 @@
           <details class="cfg"${!ud.firstName?' open':''}>
             <summary><div class="cfg-icon">⚙</div><span class="cfg-label">My Data</span></summary>
             <div class="cgrid">
-              <div class="f"><label>Nombre</label><input id="u-fn" value="${ud.firstName}" placeholder="John"></div>
-              <div class="f"><label>Apellido</label><input id="u-ln" value="${ud.lastName}" placeholder="Doe"></div>
+              <div class="f"><label>First name</label><input id="u-fn" value="${ud.firstName}" placeholder="John"></div>
+              <div class="f"><label>Last name</label><input id="u-ln" value="${ud.lastName}" placeholder="Doe"></div>
               <div class="f" style="grid-column:1/-1"><label>Email</label><input id="u-em" value="${ud.email}" placeholder="john@email.com" type="email"></div>
               <div class="f"><label>Zip</label><input id="u-zp" value="${ud.zip}" placeholder="10001"></div>
-              <div class="f"><label>País</label><select id="u-co"><option value="US"${(ud.country||'US')==='US'?' selected':''}>🇺🇸 USA</option><option value="CA"${ud.country==='CA'?' selected':''}>🇨🇦 Canada</option><option value="OTHER"${ud.country==='OTHER'?' selected':''}>Otro</option></select></div>
-              <div class="f"><label>Teléfono</label><input id="u-ph" value="${ud.phone}" placeholder="212-555-0000"></div>
+              <div class="f"><label>Country</label><select id="u-co"><option value="US"${(ud.country||'US')==='US'?' selected':''}>🇺🇸 USA</option><option value="CA"${ud.country==='CA'?' selected':''}>🇨🇦 Canada</option><option value="OTHER"${ud.country==='OTHER'?' selected':''}>Otro</option></select></div>
+              <div class="f"><label>Phone</label><input id="u-ph" value="${ud.phone}" placeholder="212-555-0000"></div>
               <div class="f"><label>Tickets</label><select id="u-tk"><option value="1"${ud.tickets==='1'?' selected':''}>1</option><option value="2"${ud.tickets!=='1'?' selected':''}>2</option></select></div>
-              <div class="f"><label>Lucky Seat horarios</label><select id="u-lsf"><option value="all"${loadLsFilter()==='all'?' selected':''}>🕐 Todos</option><option value="night"${loadLsFilter()==='night'?' selected':''}>🌙 Solo noches</option><option value="morning"${loadLsFilter()==='morning'?' selected':''}>☀️ Solo mañanas</option></select></div>
-              <div class="f" style="grid-column:1/-1"><label>Fecha de nacimiento</label><div class="dob"><input id="u-dmm" value="${ud.dobMM}" placeholder="MM" maxlength="2"><input id="u-ddd" value="${ud.dobDD}" placeholder="DD" maxlength="2"><input id="u-dyy" value="${ud.dobYYYY}" placeholder="YYYY" maxlength="4"></div></div>
+              <div class="f"><label>Showtimes filter</label><select id="u-lsf"><option value="all"${loadLsFilter()==='all'?' selected':''}>🕐 All</option><option value="night"${loadLsFilter()==='night'?' selected':''}>🌙 Nights only</option><option value="morning"${loadLsFilter()==='morning'?' selected':''}>☀️ Mornings only</option></select></div>
+              <div class="f" style="grid-column:1/-1"><label>Date of birth</label><div class="dob"><input id="u-dmm" value="${ud.dobMM}" placeholder="MM" maxlength="2"><input id="u-ddd" value="${ud.dobDD}" placeholder="DD" maxlength="2"><input id="u-dyy" value="${ud.dobYYYY}" placeholder="YYYY" maxlength="4"></div></div>
             </div>
           </details>
           <div class="bar">
-            <button class="tag${filter==='all'?' on':''}" data-f="all">Todas</button>
+            <button class="tag${filter==='all'?' on':''}" data-f="all">All</button>
             <button class="tag${filter==='bdirect'?' on':''}" data-f="bdirect">B.Direct</button>
             <button class="tag${filter==='lseat'?' on':''}" data-f="lseat">LuckySeat</button>
             <button class="tag${filter==='telecharge'?' on':''}" data-f="telecharge">Telecharge</button>
-            <div class="acts"><button id="btn-all">Todo ✓</button><button id="btn-none">×</button></div>
+            <div class="acts"><button id="btn-all">All ✓</button><button id="btn-none">×</button></div>
+            <button class="tag${globalAuto?' on':''}" id="btn-auto">${globalAuto?'⚡ Auto':'◎ Manual'}</button>
           </div>
           <div class="list">
             ${list.length===0 ? '<div class="empty">No shows found</div>' : (() => {
@@ -530,6 +532,7 @@
         shadow.querySelectorAll('.tag').forEach(b => { b.onclick = e => { e.preventDefault(); filter = b.dataset.f; render(); }; });
         shadow.querySelector('#btn-all').onclick = e => { e.preventDefault(); list.forEach(s => { if (!dis.includes(s.name)) selected.add(s.name); }); render(); };
         shadow.querySelector('#btn-none').onclick = e => { e.preventDefault(); selected.clear(); render(); };
+        shadow.querySelector('#btn-auto').onclick = e => { e.preventDefault(); globalAuto = !globalAuto; render(); };
         shadow.querySelectorAll('.card').forEach(card => {
           card.onclick = e => {
             e.preventDefault(); e.stopPropagation();
@@ -538,12 +541,13 @@
             selected.has(n) ? selected.delete(n) : selected.add(n); render();
           };
         });
+
         shadow.querySelectorAll('.dm').forEach(btn => {
           btn.onclick = e => {
             e.preventDefault(); e.stopPropagation();
             const n = btn.dataset.d; let cur = loadDisabled();
-            if (cur.includes(n)) { cur = cur.filter(x=>x!==n); toast(`✓ "${n}" reactivada`); }
-            else { cur.push(n); selected.delete(n); toast(`✕ "${n}" desactivada`); }
+            if (cur.includes(n)) { cur = cur.filter(x=>x!==n); toast(`✓ "${n}" re-enabled`); }
+            else { cur.push(n); selected.delete(n); toast(`✕ "${n}" hidden`); }
             saveDisabled(cur); render();
           };
         });
@@ -566,21 +570,23 @@
         shadow.querySelector('#btn-go').onclick = e => {
           e.preventDefault();
           const ud2 = loadUser();
-          if (!ud2.firstName || !ud2.email) { toast('⚠️ Llena nombre y email'); return; }
-          if (!ud2.dobMM || !ud2.dobDD || !ud2.dobYYYY) { toast('⚠️ Llena fecha de nacimiento'); return; }
+          if (!ud2.firstName || !ud2.email) { toast('⚠️ Fill in your name and email'); return; }
+          if (!ud2.dobMM || !ud2.dobDD || !ud2.dobYYYY) { toast('⚠️ Fill in your date of birth'); return; }
           const toOpen = []; const seen = new Set();
-          active.forEach(show => { show.links.forEach(link => { if (!seen.has(link.url + show.name)) { seen.add(link.url + show.name); toOpen.push({...link, showName: show.name}); } }); });
-          if (!toOpen.length) { toast('⚠️ No hay links'); return; }
+          active.forEach(show => { show.links.forEach(link => { if (!seen.has(link.url + show.name)) { seen.add(link.url + show.name); toOpen.push({...link, showName: show.name, isAuto: globalAuto}); } }); });
+          if (!toOpen.length) { toast('⚠️ No lottery links found'); return; }
           toOpen.forEach((item, i) => {
             setTimeout(() => {
-              // For Telecharge, append show name as hash so the bot knows which show to enter
-              const url = item.url.includes('socialtoaster.com')
-                ? item.url + '#' + encodeURIComponent(item.showName)
-                : item.url;
+              let url = item.url;
+              if (item.url.includes('socialtoaster.com')) {
+                url += '#' + encodeURIComponent(item.showName) + (item.isAuto ? '|auto' : '');
+              }
+              // Store auto/manual preference in GM storage so iframes can read it
+              GM_setValue('ap_auto_mode', item.isAuto ? '1' : '0');
               window.open(url, '_blank');
             }, i * 800);
           });
-          toast(`🚀 Abriendo ${toOpen.length} link${toOpen.length>1?'s':''}...`);
+          toast(`🚀 Opening ${toOpen.length} link${toOpen.length>1?'s':''}...`);
         };
       }
 
@@ -611,6 +617,7 @@
   function runBroadwayDirectForm() {
     const ud = loadUser();
     if (!ud.firstName || !ud.email) return;
+    const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let filled = false;
 
     function setSelect(el, val) {
@@ -646,11 +653,11 @@
           const needsCaptcha = captchaFrame && captchaFrame.offsetParent !== null && !(captchaResp && captchaResp.value && captchaResp.value.length > 10);
           const ind = document.createElement('div');
           ind.style.cssText = 'position:fixed;top:4px;right:4px;background:#111;color:#48bb78;padding:8px 14px;border-radius:8px;font:13px sans-serif;z-index:99999;box-shadow:0 2px 12px rgba(0,0,0,.4)';
-          if (!needsCaptcha) {
+          if (!needsCaptcha && !isManual) {
             const btn = [...document.querySelectorAll('input[type="submit"],button[type="submit"],button')].find(b => b.offsetParent !== null && /^(ENTER|SUBMIT)$/i.test((b.value||b.textContent).trim()));
-            if (btn) { ind.textContent = `🎭 ✓ ${count} campos — enviando...`; document.body.appendChild(ind); setTimeout(() => ind.remove(), 8000); setTimeout(() => btn.click(), 500); }
+            if (btn) { ind.textContent = `🎭 ✓ ${count} fields — submitting...`; document.body.appendChild(ind); setTimeout(() => ind.remove(), 8000); setTimeout(() => btn.click(), 500); }
           } else {
-            ind.textContent = `🎭 ✓ ${count} campos — haz reCAPTCHA + clic ENTER`;
+            ind.textContent = `🎭 ✓ ${count} fields — solve reCAPTCHA then click ENTER`;
             document.body.appendChild(ind);
             setTimeout(() => ind.remove(), 15000);
           }
@@ -669,6 +676,7 @@
     const ud = loadUser();
     const lsFilter = loadLsFilter();
     if (!ud.firstName || !ud.email) return;
+    const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let done = false;
 
     function isMorning(t) {
@@ -791,7 +799,9 @@
         setTicketCount();
         const delay = (parseInt(ud.tickets)||2) * 150 + 500;
         setTimeout(() => {
-          if (!hasPendingCaptcha()) {
+          if (isManual) {
+            showIndicator('✓ Performances selected & tickets set — click <b style="color:#fff">Submit Entry</b> when ready', '#6a8aaa');
+          } else if (!hasPendingCaptcha()) {
             showIndicator('✓ All done — submitting automatically...', '#48bb78');
             setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 600);
           } else {
@@ -812,7 +822,9 @@
     const ud = loadUser();
     if (!ud.email) return;
 
-    const targetShow = location.hash ? decodeURIComponent(location.hash.slice(1)).toLowerCase().trim() : null;
+    const hashParts = location.hash ? decodeURIComponent(location.hash.slice(1)).split('|') : [];
+    const targetShow = hashParts[0]?.toLowerCase().trim() || null;
+    const isAuto = hashParts[1] === 'auto';
     function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
     function matches(cardTitle) {
       if (!targetShow) return true;
@@ -878,10 +890,11 @@
 
         const btn = card.querySelector('a.st_campaign_button');
         if (btn) {
-          setTimeout(() => {
-            btn.click();
-            entered++;
-          }, i * 600);
+          if (isAuto) {
+            setTimeout(() => { btn.click(); entered++; }, i * 600);
+          } else {
+            entered++; // count as "handled" — page is open, user clicks manually
+          }
         }
       });
 
@@ -890,7 +903,11 @@
         if (alreadyIn > 0 && entered === 0) {
           showIndicator(`Already entered — check your email for results.`, '#ecc94b');
         } else if (entered > 0) {
-          showIndicator(`✓ Entered ${entered} lotter${entered>1?'ies':'y'} automatically.`, '#48bb78');
+          if (isAuto) {
+            showIndicator(`✓ Entered ${entered} lotter${entered>1?'ies':'y'} automatically.`, '#48bb78');
+          } else {
+            showIndicator(`✓ Form ready — click <b style="color:#fff">Enter</b> when you're ready.`, '#6a8aaa');
+          }
         }
       }, targetCards.length * 600 + 200);
     }
