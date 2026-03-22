@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      13.0
+// @version      13.1
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Claude
 // @match        https://bwayrush.com/*
 // @match        https://lottery.broadwaydirect.com/*
 // @match        https://www.luckyseat.com/*
+// @match        https://my.socialtoaster.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_addStyle
@@ -250,6 +251,7 @@
       container.querySelectorAll('a[href]').forEach(link => {
         const href = link.href || '';
         if (EXCLUDED_DOMAINS.some(d => href.includes(d)) || !LOTTERY_DOMAINS.some(d => href.includes(d))) return;
+        if (href.includes('rush_select') || href.includes('rush_')) return; // exclude Rush links
         const linkText = link.textContent.trim().toLowerCase();
         if (EXCLUDED_LABELS.some(lbl => linkText.includes(lbl))) return;
         const priceMatch = link.textContent.match(/\$[\d.\/]+/);
@@ -567,9 +569,17 @@
           if (!ud2.firstName || !ud2.email) { toast('⚠️ Llena nombre y email'); return; }
           if (!ud2.dobMM || !ud2.dobDD || !ud2.dobYYYY) { toast('⚠️ Llena fecha de nacimiento'); return; }
           const toOpen = []; const seen = new Set();
-          active.forEach(show => { show.links.forEach(link => { if (!seen.has(link.url)) { seen.add(link.url); toOpen.push(link); } }); });
+          active.forEach(show => { show.links.forEach(link => { if (!seen.has(link.url + show.name)) { seen.add(link.url + show.name); toOpen.push({...link, showName: show.name}); } }); });
           if (!toOpen.length) { toast('⚠️ No hay links'); return; }
-          toOpen.forEach((item, i) => { setTimeout(() => window.open(item.url, '_blank'), i * 800); });
+          toOpen.forEach((item, i) => {
+            setTimeout(() => {
+              // For Telecharge, append show name as hash so the bot knows which show to enter
+              const url = item.url.includes('socialtoaster.com')
+                ? item.url + '#' + encodeURIComponent(item.showName)
+                : item.url;
+              window.open(url, '_blank');
+            }, i * 800);
+          });
           toast(`🚀 Abriendo ${toOpen.length} link${toOpen.length>1?'s':''}...`);
         };
       }
@@ -796,6 +806,100 @@
     [800, 1500, 2500, 4000, 6000].forEach(t => setTimeout(() => { if (!done) tryFill(); }, t));
   }
 
+  // ═══ TELECHARGE (socialtoaster) ══════════════════════════════════════
+
+  function runTelecharge() {
+    const ud = loadUser();
+    if (!ud.email) return;
+
+    const targetShow = location.hash ? decodeURIComponent(location.hash.slice(1)).toLowerCase().trim() : null;
+    function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+    function matches(cardTitle) {
+      if (!targetShow) return true;
+      const t = normalize(targetShow);
+      const c = normalize(cardTitle);
+      // match on first 3 words of target
+      const words = t.split(' ').slice(0,3).join(' ');
+      return c.includes(words);
+    }
+
+    function showIndicator(msg, color) {
+      const old = document.getElementById('tc-ap');
+      if (old) old.remove();
+      const el = document.createElement('div');
+      el.id = 'tc-ap';
+      el.style.cssText = `position:fixed;top:10px;right:10px;z-index:999999;background:#111;color:${color||'#48bb78'};padding:12px 18px;border-radius:10px;font:14px/1.5 -apple-system,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.5);border-left:4px solid ${color||'#48bb78'};max-width:380px`;
+      el.innerHTML = `🎭 <b style="color:#fff">Telecharge</b><br>${msg}`;
+      document.body.appendChild(el);
+      setTimeout(() => { el.style.transition='opacity .5s'; el.style.opacity='0'; }, 14000);
+      setTimeout(() => el.remove(), 14500);
+    }
+
+    let done = false;
+    function tryFill() {
+      if (done) return;
+      const allCards = [...document.querySelectorAll('div.lottery_show')];
+      if (!allCards.length) return;
+      done = true;
+
+      // Set email
+      const emailField = document.querySelector('input[type="email"], input[name*="email"], input[id*="email"]');
+      if (emailField && !emailField.value) setVal(emailField, ud.email);
+
+      // Filter to target show
+      const targetCards = allCards.filter(card => {
+        const title = card.querySelector('.lottery_show_title')?.textContent?.trim() || '';
+        return matches(title);
+      });
+
+      if (targetCards.length === 0) {
+        const label = targetShow ? `<b style="color:#fff">${decodeURIComponent(location.hash.slice(1))}</b>` : 'this show';
+        showIndicator(`⚠️ No lottery found for ${label} today.<br><span style="font-size:12px;opacity:.7">It may be Closed, Upcoming, or not listed.</span>`, '#ecc94b');
+        return;
+      }
+
+      let entered = 0;
+      let alreadyIn = 0;
+
+      targetCards.forEach((card, i) => {
+        const enteredDiv = card.querySelector('.lottery_show_enter_bottom .entered-text');
+        const isAlreadyEntered = enteredDiv && enteredDiv.offsetParent !== null && /lottery entered/i.test(enteredDiv.textContent);
+
+        if (isAlreadyEntered) { alreadyIn++; return; }
+
+        // Set tickets
+        const sel = card.querySelector('select[id^="tickets_"]');
+        if (sel) {
+          const target = ud.tickets || '2';
+          for (let j = 0; j < sel.options.length; j++) {
+            if (sel.options[j].value === target) { sel.selectedIndex = j; sel.dispatchEvent(new Event('change',{bubbles:true})); break; }
+          }
+        }
+
+        const btn = card.querySelector('a.st_campaign_button');
+        if (btn) {
+          setTimeout(() => {
+            btn.click();
+            entered++;
+          }, i * 600);
+        }
+      });
+
+      // Show result after all clicks
+      setTimeout(() => {
+        if (alreadyIn > 0 && entered === 0) {
+          showIndicator(`Already entered — check your email for results.`, '#ecc94b');
+        } else if (entered > 0) {
+          showIndicator(`✓ Entered ${entered} lotter${entered>1?'ies':'y'} automatically.`, '#48bb78');
+        }
+      }, targetCards.length * 600 + 200);
+    }
+
+    const obs = new MutationObserver(() => { if (!done && document.querySelector('div.lottery_show')) { obs.disconnect(); setTimeout(tryFill, 500); } });
+    obs.observe(document.body, { childList: true, subtree: true });
+    [800, 1500, 2500, 4000].forEach(t => setTimeout(() => { if (!done) tryFill(); }, t));
+  }
+
   // ═══ ROUTER ══════════════════════════════════════════════════════════
 
   const h = location.hostname;
@@ -804,5 +908,6 @@
   else if (h.includes('broadwaydirect.com') && p.includes('/enter-lottery'))  runBroadwayDirectForm();
   else if (h.includes('broadwaydirect.com'))                                   runBroadwayDirect();
   else if (h.includes('luckyseat.com') && p.includes('/shows/'))              runLuckySeat();
+  else if (h.includes('socialtoaster.com'))                                    runTelecharge();
 
 })();
