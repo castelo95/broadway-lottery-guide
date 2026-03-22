@@ -3,264 +3,319 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Broadway Lottery Autopilot — Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Broadway Lottery Autopilot</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --red: #e53e3e;
-    --gold: #d4a843;
-    --bg: #0a0a0a;
-    --bg2: #111;
-    --bg3: #1a1a1a;
-    --border: #222;
-    --text: #ddd;
-    --muted: #666;
-    --white: #fff;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.7; overflow-x: hidden; }
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#0a0806;color:#c8b89a;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
 
-  .hero { position: relative; padding: 80px 24px 60px; text-align: center; overflow: hidden; border-bottom: 1px solid var(--border); }
-  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(229,62,62,.18) 0%, transparent 70%); pointer-events: none; }
-  .hero-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(212,168,67,.3); padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 3.8rem); font-weight: 900; color: var(--white); line-height: 1.1; margin-bottom: 8px; }
-  .hero h1 em { color: var(--red); font-style: italic; }
-  .hero-sub { font-size: 14px; color: var(--muted); margin-top: 12px; }
-  .hero-badges { display: flex; justify-content: center; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
-  .badge { background: var(--bg3); border: 1px solid var(--border); padding: 5px 14px; border-radius: 20px; font-size: 12px; color: #aaa; }
-  .badge b { color: var(--white); }
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;border-bottom:1px solid #1e1a14}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,151,58,.12) 0%,transparent 70%);pointer-events:none}
+.hero-ornament{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.orn-line{width:60px;height:1px;background:linear-gradient(90deg,transparent,#c9973a)}
+.orn-line.r{background:linear-gradient(90deg,#c9973a,transparent)}
+.orn-diamond{width:8px;height:8px;background:#c9973a;transform:rotate(45deg)}
+.hero-tag{font-size:10px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#c9973a;margin-bottom:20px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:700;color:#f0e6d0;line-height:1;margin-bottom:12px;letter-spacing:-1px}
+.hero h1 em{font-style:italic;font-weight:300;color:#c9973a}
+.hero-sub{font-size:16px;color:#6a5a40;max-width:480px;margin:0 auto 48px;letter-spacing:.3px}
+.hero-badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:56px}
+.badge{background:#111009;border:1px solid #2a2018;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:600;color:#6a5a40;letter-spacing:.5px}
+.badge.green{color:#5a8a6a;border-color:#2a3a2a}
+.badge.gold{color:#c9973a;border-color:#3a2a10}
+.hero-scroll{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3a3020;display:flex;flex-direction:column;align-items:center;gap:8px}
+.hero-scroll::after{content:'';width:1px;height:40px;background:linear-gradient(to bottom,#3a3020,transparent)}
 
-  .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
-  .section { padding: 52px 0 0; }
-  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
-  .section h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700; color: var(--white); margin-bottom: 20px; line-height: 1.2; }
+/* DOWNLOAD SECTION */
+.download-section{padding:80px 24px;text-align:center;border-bottom:1px solid #1e1a14;background:#0d0b09}
+.download-section h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:#f0e6d0;margin-bottom:12px}
+.download-section p{color:#6a5a40;margin-bottom:36px;font-size:15px}
+.download-btn{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,#c9973a,#a07020);color:#0a0806;padding:18px 40px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;position:relative;overflow:hidden}
+.download-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s}
+.download-btn:hover::before{opacity:1}
+.download-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,151,58,.4)}
+.download-note{font-size:12px;color:#3a3020;margin-top:20px;letter-spacing:.3px}
+.download-note a{color:#5a4a30;text-decoration:underline}
 
-  .steps { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
-  .step { display: flex; gap: 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
-  .step-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--red); color: var(--white); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
-  .step-body h3 { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
-  .step-body p { font-size: 13px; color: #999; line-height: 1.6; }
-  .step-body a { color: var(--red); text-decoration: none; }
-  .step-body code { background: #1f1f1f; border: 1px solid #2a2a2a; padding: 1px 7px; border-radius: 4px; font-size: 12px; color: #ecc94b; font-family: monospace; }
+/* CONTAINER */
+.container{max-width:860px;margin:0 auto;padding:0 24px}
 
-  .platforms { display: grid; gap: 14px; margin-top: 8px; }
-  .plat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; border-left: 3px solid var(--red); }
-  .plat-card h3 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .plat-badge { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: rgba(72,187,120,.15); color: #48bb78; border: 1px solid rgba(72,187,120,.25); }
-  .plat-badge.wip { background: rgba(236,201,74,.1); color: #ecc94b; border-color: rgba(236,201,74,.25); }
-  .plat-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-  .plat-card ul li { font-size: 13px; color: #999; padding-left: 16px; position: relative; }
-  .plat-card ul li::before { content: '→'; position: absolute; left: 0; color: var(--red); font-size: 11px; top: 2px; }
+/* SECTION */
+.section{padding:80px 0}
+.section+.section{border-top:1px solid #1a1610}
+.section-label{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c9973a;margin-bottom:12px}
+.section h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:600;color:#f0e6d0;margin-bottom:32px;line-height:1.2}
 
-  .panel-guide { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 8px; }
-  .panel-guide-header { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 14px 20px; font-size: 12px; font-weight: 600; color: #666; letter-spacing: 1px; text-transform: uppercase; }
-  .panel-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-  .field-row { padding: 12px 20px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
-  .field-row:nth-child(even) { border-right: none; }
-  .field-row:nth-last-child(-n+2) { border-bottom: none; }
-  .field-name { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
-  .field-desc { font-size: 12px; color: #aaa; }
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:2px}
+.step{display:flex;gap:0;background:#111009;border:1px solid #1e1a14;overflow:hidden;border-radius:6px}
+.step-num{width:64px;flex-shrink:0;background:#1a1610;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#c9973a}
+.step-body{padding:20px 24px;flex:1}
+.step-body h3{font-size:15px;font-weight:600;color:#f0e6d0;margin-bottom:6px;letter-spacing:.2px}
+.step-body p{font-size:13px;color:#8a7a60;line-height:1.65}
+.step-body a{color:#c9973a;text-decoration:none}
+.step-body code{background:#1a1610;border:1px solid #2a2018;padding:1px 7px;border-radius:3px;font-size:12px;color:#ecc94b;font-family:monospace}
 
-  .qa-list { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
-  .qa-item { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg2); }
-  .qa-q { padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--white); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: background .15s; }
-  .qa-q:hover { background: var(--bg3); }
-  .qa-q .arrow { color: var(--red); font-size: 16px; transition: transform .2s; flex-shrink: 0; margin-left: 12px; }
-  .qa-a { display: none; padding: 0 18px 14px; font-size: 13px; color: #999; line-height: 1.65; border-top: 1px solid var(--border); }
-  .qa-item.open .qa-a { display: block; }
-  .qa-item.open .arrow { transform: rotate(90deg); }
-  .qa-a b { color: var(--white); }
+/* PLATFORM CARDS */
+.plat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.plat-card{background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:24px;border-top:2px solid #c9973a}
+.plat-card.coming{border-top-color:#2a2018}
+.plat-card h3{font-size:16px;font-weight:600;color:#f0e6d0;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.plat-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;background:rgba(90,138,106,.15);color:#5a8a6a;border:1px solid rgba(90,138,106,.25)}
+.plat-badge.soon{background:rgba(106,90,64,.15);color:#6a5a40;border-color:rgba(106,90,64,.25)}
+.plat-card ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.plat-card li{font-size:13px;color:#8a7a60;padding-left:14px;position:relative;line-height:1.5}
+.plat-card li::before{content:'—';position:absolute;left:0;color:#c9973a;font-size:10px;top:3px}
 
-  .tips { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-  .tip { display: flex; gap: 14px; align-items: flex-start; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-  .tip-text { font-size: 13px; color: #999; }
-  .tip-text b { color: var(--white); }
+/* PANEL TABLE */
+.panel-table{background:#111009;border:1px solid #1e1a14;border-radius:6px;overflow:hidden}
+.panel-table-hdr{background:#1a1610;padding:14px 20px;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6a5a40;border-bottom:1px solid #1e1a14}
+.panel-fields{display:grid;grid-template-columns:1fr 1fr}
+.field-row{padding:14px 20px;border-bottom:1px solid #1a1610;border-right:1px solid #1a1610}
+.field-row:nth-child(even){border-right:none}
+.field-row:nth-last-child(-n+2){border-bottom:none}
+.field-name{font-size:10px;font-weight:600;color:#c9973a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.field-desc{font-size:12px;color:#8a7a60;line-height:1.5}
 
-  .footer { margin-top: 60px; border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
-  .footer p { font-size: 12px; color: var(--muted); }
-  .divider { height: 1px; background: var(--border); margin: 52px 0 0; }
+/* TIPS */
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.tip{background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px;display:flex;gap:14px}
+.tip-icon{font-size:20px;flex-shrink:0;line-height:1.4}
+.tip-text{font-size:13px;color:#8a7a60;line-height:1.6}
+.tip-text strong{color:#d4c4a0;font-weight:600}
+
+/* FAQ */
+.faq{display:flex;flex-direction:column;gap:2px}
+.faq-item{border:1px solid #1e1a14;border-radius:6px;overflow:hidden;background:#111009}
+.faq-q{padding:16px 20px;font-size:14px;font-weight:600;color:#d4c4a0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .15s;gap:16px}
+.faq-q:hover{background:#161209}
+.faq-arrow{color:#c9973a;font-size:18px;flex-shrink:0;transition:transform .2s;font-family:'Cormorant Garamond',serif}
+.faq-a{display:none;padding:0 20px 16px;font-size:13px;color:#8a7a60;line-height:1.7;border-top:1px solid #1a1610}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-arrow{transform:rotate(90deg)}
+.faq-a strong{color:#d4c4a0}
+
+/* FOOTER */
+footer{border-top:1px solid #1e1a14;padding:48px 24px;text-align:center;background:#0d0b09}
+.footer-ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
+footer p{font-size:12px;color:#3a3020;line-height:1.8}
+footer a{color:#5a4a30;text-decoration:none}
+
+@media(max-width:600px){
+  .panel-fields{grid-template-columns:1fr}
+  .field-row{border-right:none}
+  .field-row:nth-last-child(-n+2){border-bottom:1px solid #1a1610}
+  .field-row:last-child{border-bottom:none}
+  .step{flex-direction:column}
+  .step-num{width:100%;height:48px;font-size:1.5rem}
+}
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-tag">User Guide · v13.0</div>
-  <h1>Broadway Lottery<br><em>Autopilot</em></h1>
-  <p class="hero-sub">by Javier Castello — Tampermonkey userscript for automatic Broadway lottery entries</p>
-  <div class="hero-badges">
-    <span class="badge"><b>Broadway Direct</b> ✓</span>
-    <span class="badge"><b>Lucky Seat</b> ✓</span>
-    <span class="badge"><b>Telecharge</b> coming soon</span>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-ornament">
+    <div class="orn-line"></div>
+    <div class="orn-diamond"></div>
+    <div class="orn-line r"></div>
   </div>
-</div>
+  <div class="hero-tag">New York · Broadway · Autopilot</div>
+  <h1>Broadway<br><em>Lottery</em></h1>
+  <p class="hero-sub">The Tampermonkey userscript that automatically enters Broadway lotteries for you — by Javier Castello</p>
+  <div class="hero-badges">
+    <span class="badge green">✓ Broadway Direct</span>
+    <span class="badge green">✓ Lucky Seat</span>
+    <span class="badge">Telecharge — coming soon</span>
+    <span class="badge gold">Free · Open source</span>
+  </div>
+  <div class="hero-scroll">Scroll to install</div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="download-section">
+  <div class="container">
+    <div class="section-label">One-click install</div>
+    <h2>Get the script</h2>
+    <p>Download the userscript and Tampermonkey will install it automatically.</p>
+    <a class="download-btn" href="https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js">
+      ⬇ &nbsp; Download Broadway Lottery Autopilot
+    </a>
+    <p class="download-note">
+      Version 13.0 &nbsp;·&nbsp; Requires <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> &nbsp;·&nbsp; Works on Chrome, Firefox, Edge
+    </p>
+  </div>
+</section>
 
 <div class="container">
 
-  <div class="section">
-    <div class="section-label">Getting Started</div>
-    <h2>Installation</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>Install Tampermonkey</h3>
-          <p>Download the <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey extension</a> for Chrome or Firefox. It's free and allows custom scripts to run on websites.</p>
-        </div>
+<!-- INSTALL -->
+<section class="section">
+  <div class="section-label">Getting started</div>
+  <h2>Installation in 4 steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Install Tampermonkey</h3>
+        <p>Download <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> for your browser — Chrome, Firefox or Edge. It's free and takes 30 seconds to install.</p>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>Add the script</h3>
-          <p>Open Tampermonkey → click <code>+</code> to create a new script → paste the full contents of the script file → save with <code>Ctrl+S</code>.</p>
-        </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Download the script</h3>
+        <p>Click the Download button above. Tampermonkey will detect it automatically and open an installation page. Click <strong style="color:#d4c4a0">Install</strong> to confirm.</p>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3>Configure your data</h3>
-          <p>Go to <a href="https://bwayrush.com" target="_blank">bwayrush.com</a>. A 🎭 button will appear in the bottom-right corner. Click it and open <b>My Data</b> to fill in your personal details.</p>
-        </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Fill in your data</h3>
+        <p>Go to <a href="https://bwayrush.com" target="_blank">bwayrush.com</a>. A gold 🎭 button appears bottom-right. Click it, open <strong style="color:#d4c4a0">My Data</strong>, and fill in your name, email, date of birth and zip code.</p>
       </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h3>Select shows and launch</h3>
-          <p>Check the shows you want to enter, then click <b>🚀 Open lotteries</b>. Each lottery page will open in a new tab and auto-fill itself.</p>
-        </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Select shows and go</h3>
+        <p>Check the shows you want to enter and click <strong style="color:#d4c4a0">🚀 Open lotteries</strong>. Each lottery page opens in a new tab and fills itself automatically.</p>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="divider"></div>
-
-  <div class="section">
-    <div class="section-label">Configuration</div>
-    <h2>Panel fields explained</h2>
-    <div class="panel-guide">
-      <div class="panel-guide-header">⚙ My Data</div>
-      <div class="panel-fields">
-        <div class="field-row"><div class="field-name">Nombre / Apellido</div><div class="field-desc">Your legal first and last name — must match your photo ID</div></div>
-        <div class="field-row"><div class="field-name">Email</div><div class="field-desc">Where you'll receive win/loss notifications</div></div>
-        <div class="field-row"><div class="field-name">Zip</div><div class="field-desc">Your 5-digit US zip code (e.g. 10027)</div></div>
-        <div class="field-row"><div class="field-name">País</div><div class="field-desc">🇺🇸 USA for US residents (default)</div></div>
-        <div class="field-row"><div class="field-name">Teléfono</div><div class="field-desc">Optional — used for SMS winner notifications</div></div>
-        <div class="field-row"><div class="field-name">Tickets</div><div class="field-desc">1 or 2 — applies to all platforms</div></div>
-        <div class="field-row"><div class="field-name">Fecha de nacimiento</div><div class="field-desc">MM / DD / YYYY — required by most lotteries</div></div>
-        <div class="field-row"><div class="field-name">Lucky Seat horarios</div><div class="field-desc">🕐 All · 🌙 Nights only (5pm+) · ☀️ Mornings only. Weekends always get all showtimes.</div></div>
-      </div>
+<!-- CONFIG -->
+<section class="section">
+  <div class="section-label">Configuration</div>
+  <h2>Panel fields explained</h2>
+  <div class="panel-table">
+    <div class="panel-table-hdr">⚙ My Data</div>
+    <div class="panel-fields">
+      <div class="field-row"><div class="field-name">Nombre / Apellido</div><div class="field-desc">Your legal first and last name — must match your photo ID at the box office</div></div>
+      <div class="field-row"><div class="field-name">Email</div><div class="field-desc">Where you'll receive win/loss notifications from each lottery</div></div>
+      <div class="field-row"><div class="field-name">Zip</div><div class="field-desc">Your 5-digit US zip code (e.g. 10027 for Harlem)</div></div>
+      <div class="field-row"><div class="field-name">País</div><div class="field-desc">Country of residence — 🇺🇸 USA for US residents</div></div>
+      <div class="field-row"><div class="field-name">Teléfono</div><div class="field-desc">Optional — used for SMS winner notifications on some platforms</div></div>
+      <div class="field-row"><div class="field-name">Tickets</div><div class="field-desc">1 or 2 tickets — applied automatically to all platforms</div></div>
+      <div class="field-row"><div class="field-name">Fecha de nacimiento</div><div class="field-desc">MM / DD / YYYY format — required by most Broadway lotteries</div></div>
+      <div class="field-row"><div class="field-name">Lucky Seat horarios</div><div class="field-desc">🕐 All · 🌙 Nights only (5pm+) · ☀️ Mornings only. Weekends always get all showtimes.</div></div>
     </div>
   </div>
+</section>
 
-  <div class="divider"></div>
-
-  <div class="section">
-    <div class="section-label">How it works</div>
-    <h2>Platform behaviour</h2>
-    <div class="platforms">
-      <div class="plat-card">
-        <h3>Broadway Direct <span class="plat-badge">Auto</span></h3>
-        <ul>
-          <li>Opens each available "ENTER NOW" lottery in sequence</li>
-          <li>Auto-fills all form fields (name, email, DOB, zip, country, tickets)</li>
-          <li>If no reCAPTCHA appears → clicks ENTER automatically</li>
-          <li>If reCAPTCHA appears → waits for you to solve it, then moves to the next show</li>
-          <li>Detects the SUCCESS modal and closes it automatically to continue</li>
-          <li>If no open lotteries found → shows a clear message explaining why</li>
-        </ul>
-      </div>
-      <div class="plat-card">
-        <h3>Lucky Seat <span class="plat-badge">Auto</span></h3>
-        <ul>
-          <li>Runs when you open any <code>luckyseat.com/shows/...</code> page</li>
-          <li>Selects performances based on your time-of-day filter</li>
-          <li>Weekend showtimes (Sat/Sun) are always all selected</li>
-          <li>Detects already-entered slots (shown in red) and skips them</li>
-          <li>Shows a message if all performances for your filter are already entered</li>
-          <li>Auto-submits if no captcha, otherwise prompts you to solve it</li>
-        </ul>
-      </div>
-      <div class="plat-card">
-        <h3>Telecharge <span class="plat-badge wip">Coming soon</span></h3>
-        <ul>
-          <li>Support in development — will be added in a future version</li>
-        </ul>
-      </div>
+<!-- PLATFORMS -->
+<section class="section">
+  <div class="section-label">How it works</div>
+  <h2>Platform behaviour</h2>
+  <div class="plat-grid">
+    <div class="plat-card">
+      <h3>Broadway Direct <span class="plat-badge">Auto</span></h3>
+      <ul>
+        <li>Opens each "ENTER NOW" lottery in sequence</li>
+        <li>Auto-fills name, email, DOB, zip, country, tickets</li>
+        <li>No reCAPTCHA → clicks ENTER automatically</li>
+        <li>reCAPTCHA → waits for you, then continues</li>
+        <li>Detects SUCCESS modal, closes it, moves to next show</li>
+        <li>Shows a clear message if no open lotteries found</li>
+      </ul>
+    </div>
+    <div class="plat-card">
+      <h3>Lucky Seat <span class="plat-badge">Auto</span></h3>
+      <ul>
+        <li>Runs on any luckyseat.com/shows/... page</li>
+        <li>Selects performances by your time-of-day filter</li>
+        <li>Weekends (Sat/Sun) always get all showtimes</li>
+        <li>Skips already-entered slots (shown in red)</li>
+        <li>Tells you if all your filter's slots are entered</li>
+        <li>Auto-submits when no captcha is present</li>
+      </ul>
+    </div>
+    <div class="plat-card coming">
+      <h3>Telecharge <span class="plat-badge soon">Soon</span></h3>
+      <ul>
+        <li>Support in development</li>
+        <li>Will be added in a future version</li>
+        <li>Check back for updates</li>
+      </ul>
     </div>
   </div>
+</section>
 
-  <div class="divider"></div>
+<!-- TIPS -->
+<section class="section">
+  <div class="section-label">Best practices</div>
+  <h2>Tips for more wins</h2>
+  <div class="tips">
+    <div class="tip"><div class="tip-icon">🎯</div><div class="tip-text"><strong>Enter every day.</strong> Lotteries reset per performance. Consistency dramatically increases your odds over time.</div></div>
+    <div class="tip"><div class="tip-icon">📬</div><div class="tip-text"><strong>Watch your email.</strong> You usually have only 60 minutes to claim your tickets after winning. Don't miss the window.</div></div>
+    <div class="tip"><div class="tip-icon">🌙</div><div class="tip-text"><strong>Try matinées.</strong> Evening shows have more competition. Morning/afternoon lotteries tend to have better odds.</div></div>
+    <div class="tip"><div class="tip-icon">🎭</div><div class="tip-text"><strong>Enter multiple shows.</strong> You can win tickets to more than one show for the same night — enter as many as you want.</div></div>
+    <div class="tip"><div class="tip-icon">🪪</div><div class="tip-text"><strong>Use your real name.</strong> Winners must show photo ID at the box office. Nicknames get your tickets cancelled.</div></div>
+    <div class="tip"><div class="tip-icon">🔄</div><div class="tip-text"><strong>Lucky Seat re-entry is safe.</strong> Your latest entry automatically replaces the previous one — no risk of disqualification.</div></div>
+  </div>
+</section>
 
-  <div class="section">
-    <div class="section-label">Best practices</div>
-    <h2>Tips for more wins</h2>
-    <div class="tips">
-      <div class="tip"><div class="tip-icon">🎯</div><div class="tip-text"><b>Enter every day.</b> Lotteries reset per performance. Entering consistently dramatically increases your odds over time.</div></div>
-      <div class="tip"><div class="tip-icon">📬</div><div class="tip-text"><b>Watch your email closely.</b> Winner windows are short — usually 60 minutes. If you miss it, your tickets may be released.</div></div>
-      <div class="tip"><div class="tip-icon">🌙</div><div class="tip-text"><b>Evening shows have more competition.</b> Try selecting "Solo mañanas" — matinée lotteries tend to have fewer entrants.</div></div>
-      <div class="tip"><div class="tip-icon">🎭</div><div class="tip-text"><b>Enter multiple shows for the same time slot.</b> You can win tickets to more than one performance per slot.</div></div>
-      <div class="tip"><div class="tip-icon">⚠️</div><div class="tip-text"><b>Use your real name.</b> Winners must show a matching photo ID at the box office. Nicknames will get your tickets cancelled.</div></div>
-      <div class="tip"><div class="tip-icon">🔄</div><div class="tip-text"><b>Already entered Lucky Seat?</b> Your latest entry automatically replaces the previous one — re-entering is safe.</div></div>
+<!-- FAQ -->
+<section class="section">
+  <div class="section-label">FAQ</div>
+  <h2>Questions & answers</h2>
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q">Is this script safe? Will I get banned? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">The script runs entirely in your browser and stores no data externally. It mimics normal human behavior — filling forms and clicking buttons. That said, lottery terms of service prohibit automated entries. Use at your own discretion.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why does it sometimes ask me to solve a reCAPTCHA? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">reCAPTCHA requires human interaction and can't be bypassed for free. When detected, the script fills everything else and waits for you to click "I'm not a robot." Many sessions have no captcha at all — in those cases it submits fully automatically.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Broadway Direct shows no ENTER NOW buttons — what happened? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">A banner appears after a few seconds explaining the reason: all lotteries may be <strong>Closed</strong> or <strong>Upcoming</strong>, you may have <strong>already entered</strong>, or the lottery hasn't opened yet. Check the schedule shown on the show page.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Lucky Seat says "already entered all performances" — what does that mean? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">All performances matching your time filter (morning/evening) are already entered — they appear in red on the page. Nothing left to do for this show. Check your email for results, or try a different show.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I enter the same show twice? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">On <strong>Broadway Direct</strong>, duplicate entries for the same performance are disqualified. On <strong>Lucky Seat</strong>, your latest entry automatically replaces the previous one — re-entering is completely safe.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">I won! What do I do next? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">Check your email immediately — you have about <strong>60 minutes</strong> to claim and pay via credit card. On Broadway Direct check your status at lottery.broadwaydirect.com. On Lucky Seat, log into your account dashboard.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why are TodayTix and Hamilton not supported? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">TodayTix requires a native mobile app. Hamilton's lottery uses its own platform with strong anti-bot protections. Both are intentionally excluded.</div>
     </div>
   </div>
-
-  <div class="divider"></div>
-
-  <div class="section">
-    <div class="section-label">FAQ</div>
-    <h2>Questions & Answers</h2>
-    <div class="qa-list">
-      <div class="qa-item">
-        <div class="qa-q">Is this script safe to use? Will I get banned? <span class="arrow">›</span></div>
-        <div class="qa-a">The script runs entirely in your browser and doesn't store any data externally. It mimics normal human behavior — filling forms and clicking buttons. That said, lottery terms of service prohibit automated entries. Use it at your own discretion.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">Why does it ask me to solve a reCAPTCHA sometimes? <span class="arrow">›</span></div>
-        <div class="qa-a">reCAPTCHA is a bot-detection challenge that requires human interaction. It cannot be bypassed for free. When the script detects one, it fills everything else and waits for you to click "I'm not a robot."</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">The script didn't fill some fields — what happened? <span class="arrow">›</span></div>
-        <div class="qa-a">Lottery sites update their HTML from time to time. If this happens, you can still fill missing fields manually before clicking ENTER.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">Can I enter the same show twice? <span class="arrow">›</span></div>
-        <div class="qa-a">On <b>Broadway Direct</b>, duplicate entries are disqualified. On <b>Lucky Seat</b>, your latest entry replaces the previous one automatically — re-entering is fine.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">Lucky Seat says "already entered all performances" — what does that mean? <span class="arrow">›</span></div>
-        <div class="qa-a">It means all the performances that match your time filter (morning/night) are already entered — they appear in red on the page. Check your email for results, or try a different show.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">Broadway Direct shows no "ENTER NOW" buttons — what do I do? <span class="arrow">›</span></div>
-        <div class="qa-a">A banner will appear explaining the reason: all lotteries may be Closed or Upcoming, you may have already entered, or the lottery hasn't opened yet. Check the schedule on the show page.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">I won! What do I do next? <span class="arrow">›</span></div>
-        <div class="qa-a">Check your email immediately — you'll have about 60 minutes to claim and pay for your tickets via credit card. On Broadway Direct you can also check status at <b>lottery.broadwaydirect.com</b>. On Lucky Seat, log into your account dashboard.</div>
-      </div>
-      <div class="qa-item">
-        <div class="qa-q">What happened to TodayTix and Hamilton? <span class="arrow">›</span></div>
-        <div class="qa-a">TodayTix requires a native app for lottery entries. Hamilton's lottery is managed by its own platform with strong anti-bot protections. Both are excluded intentionally.</div>
-      </div>
-    </div>
-  </div>
+</section>
 
 </div>
 
-<div class="footer">
-  <p>Broadway Lottery Autopilot · v13.0 · <b>by Javier Castello</b></p>
-  <p style="margin-top:6px">For personal use only · Not affiliated with Broadway Direct, Lucky Seat, or Telecharge</p>
-</div>
+<footer>
+  <div class="footer-ornament">
+    <div class="orn-line"></div>
+    <div class="orn-diamond"></div>
+    <div class="orn-line r"></div>
+  </div>
+  <p>Broadway Lottery Autopilot &nbsp;·&nbsp; v13.0 &nbsp;·&nbsp; by Javier Castello</p>
+  <p style="margin-top:6px">For personal use only &nbsp;·&nbsp; Not affiliated with Broadway Direct, Lucky Seat, or Telecharge</p>
+</footer>
 
 <script>
-  document.querySelectorAll('.qa-q').forEach(q => {
-    q.addEventListener('click', () => {
-      const item = q.parentElement;
-      const wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.qa-item').forEach(i => i.classList.remove('open'));
-      if (!wasOpen) item.classList.add('open');
-    });
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.parentElement;
+    const wasOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!wasOpen)item.classList.add('open');
   });
+});
 </script>
 </body>
 </html>
