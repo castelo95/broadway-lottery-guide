@@ -3,14 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Broadway Lottery Autopilot</title>
+<title>Broadway Lottery Autopilot — Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:#0a0806;color:#c8b89a;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
-
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;border-bottom:1px solid #1e1a14}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,151,58,.12) 0%,transparent 70%);pointer-events:none}
 .hero-ornament{display:flex;align-items:center;gap:10px;margin-bottom:32px}
@@ -27,50 +25,44 @@ body{background:#0a0806;color:#c8b89a;font-family:'Space Grotesk',sans-serif;fon
 .badge.gold{color:#c9973a;border-color:#3a2a10}
 .hero-scroll{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3a3020;display:flex;flex-direction:column;align-items:center;gap:8px}
 .hero-scroll::after{content:'';width:1px;height:40px;background:linear-gradient(to bottom,#3a3020,transparent)}
-
-/* DOWNLOAD SECTION */
 .download-section{padding:80px 24px;text-align:center;border-bottom:1px solid #1e1a14;background:#0d0b09}
 .download-section h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:#f0e6d0;margin-bottom:12px}
 .download-section p{color:#6a5a40;margin-bottom:36px;font-size:15px}
-.download-btn{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,#c9973a,#a07020);color:#0a0806;padding:18px 40px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;position:relative;overflow:hidden}
-.download-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s}
-.download-btn:hover::before{opacity:1}
+.download-btn{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,#c9973a,#a07020);color:#0a0806;padding:18px 40px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s}
 .download-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,151,58,.4)}
-.download-note{font-size:12px;color:#3a3020;margin-top:20px;letter-spacing:.3px}
+.download-note{font-size:12px;color:#3a3020;margin-top:20px}
 .download-note a{color:#5a4a30;text-decoration:underline}
-
-/* CONTAINER */
 .container{max-width:860px;margin:0 auto;padding:0 24px}
-
-/* SECTION */
 .section{padding:80px 0}
 .section+.section{border-top:1px solid #1a1610}
 .section-label{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c9973a;margin-bottom:12px}
 .section h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:600;color:#f0e6d0;margin-bottom:32px;line-height:1.2}
-
-/* STEPS */
 .steps{display:flex;flex-direction:column;gap:2px}
-.step{display:flex;gap:0;background:#111009;border:1px solid #1e1a14;overflow:hidden;border-radius:6px}
+.step{display:flex;background:#111009;border:1px solid #1e1a14;overflow:hidden;border-radius:6px}
 .step-num{width:64px;flex-shrink:0;background:#1a1610;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#c9973a}
 .step-body{padding:20px 24px;flex:1}
-.step-body h3{font-size:15px;font-weight:600;color:#f0e6d0;margin-bottom:6px;letter-spacing:.2px}
+.step-body h3{font-size:15px;font-weight:600;color:#f0e6d0;margin-bottom:6px}
 .step-body p{font-size:13px;color:#8a7a60;line-height:1.65}
 .step-body a{color:#c9973a;text-decoration:none}
 .step-body code{background:#1a1610;border:1px solid #2a2018;padding:1px 7px;border-radius:3px;font-size:12px;color:#ecc94b;font-family:monospace}
-
-/* PLATFORM CARDS */
+.alert{background:#1a1610;border:1px solid rgba(201,151,58,.3);border-radius:6px;padding:18px 22px;margin-bottom:24px}
+.alert-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c9973a;margin-bottom:10px}
+.alert p{font-size:13px;color:#8a7a60;line-height:1.7;margin-bottom:10px}
+.platform-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.platform-row:last-child{margin-bottom:0}
+.plat-label{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;min-width:120px;padding-top:1px}
+.plat-label.green{color:#5a8a6a}
+.plat-label.gold{color:#c9973a}
+.plat-desc{font-size:12px;color:#6a5a40;line-height:1.6}
+.plat-desc a{color:#c9973a;text-decoration:none}
 .plat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .plat-card{background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:24px;border-top:2px solid #c9973a}
-.plat-card.coming{border-top-color:#2a2018}
 .plat-card h3{font-size:16px;font-weight:600;color:#f0e6d0;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .plat-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;background:rgba(90,138,106,.15);color:#5a8a6a;border:1px solid rgba(90,138,106,.25)}
-.plat-badge.soon{background:rgba(106,90,64,.15);color:#6a5a40;border-color:rgba(106,90,64,.25)}
 .plat-card ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:7px}
 .plat-card li{font-size:13px;color:#8a7a60;padding-left:14px;position:relative;line-height:1.5}
 .plat-card li::before{content:'—';position:absolute;left:0;color:#c9973a;font-size:10px;top:3px}
-
-/* PANEL TABLE */
-.panel-table{background:#111009;border:1px solid #1e1a14;border-radius:6px;overflow:hidden}
+.panel-table{background:#111009;border:1px solid #1e1a14;border-radius:6px;overflow:hidden;margin-bottom:20px}
 .panel-table-hdr{background:#1a1610;padding:14px 20px;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6a5a40;border-bottom:1px solid #1e1a14}
 .panel-fields{display:grid;grid-template-columns:1fr 1fr}
 .field-row{padding:14px 20px;border-bottom:1px solid #1a1610;border-right:1px solid #1a1610}
@@ -78,15 +70,21 @@ body{background:#0a0806;color:#c8b89a;font-family:'Space Grotesk',sans-serif;fon
 .field-row:nth-last-child(-n+2){border-bottom:none}
 .field-name{font-size:10px;font-weight:600;color:#c9973a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
 .field-desc{font-size:12px;color:#8a7a60;line-height:1.5}
-
-/* TIPS */
+.mode-box{background:#111009;border:1px solid #1e1a14;border-radius:6px;overflow:hidden}
+.mode-row{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid #1a1610}
+.mode-row:last-child{border-bottom:none}
+.mode-label{padding:16px 20px;background:#1a1610;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;border-right:1px solid #1e1a14}
+.mode-tag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.mode-tag.manual{background:rgba(106,90,64,.2);color:#6a5a40;border:1px solid rgba(106,90,64,.3)}
+.mode-tag.auto{background:rgba(201,151,58,.2);color:#c9973a;border:1px solid rgba(201,151,58,.3)}
+.mode-body{padding:16px 20px}
+.mode-body h4{font-size:13px;font-weight:600;color:#d4c4a0;margin-bottom:4px}
+.mode-body p{font-size:12px;color:#8a7a60;line-height:1.6}
 .tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
 .tip{background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px;display:flex;gap:14px}
 .tip-icon{font-size:20px;flex-shrink:0;line-height:1.4}
 .tip-text{font-size:13px;color:#8a7a60;line-height:1.6}
 .tip-text strong{color:#d4c4a0;font-weight:600}
-
-/* FAQ */
 .faq{display:flex;flex-direction:column;gap:2px}
 .faq-item{border:1px solid #1e1a14;border-radius:6px;overflow:hidden;background:#111009}
 .faq-q{padding:16px 20px;font-size:14px;font-weight:600;color:#d4c4a0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .15s;gap:16px}
@@ -96,13 +94,10 @@ body{background:#0a0806;color:#c8b89a;font-family:'Space Grotesk',sans-serif;fon
 .faq-item.open .faq-a{display:block}
 .faq-item.open .faq-arrow{transform:rotate(90deg)}
 .faq-a strong{color:#d4c4a0}
-
-/* FOOTER */
+.divider{height:1px;background:#1a1610}
 footer{border-top:1px solid #1e1a14;padding:48px 24px;text-align:center;background:#0d0b09}
 .footer-ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
 footer p{font-size:12px;color:#3a3020;line-height:1.8}
-footer a{color:#5a4a30;text-decoration:none}
-
 @media(max-width:600px){
   .panel-fields{grid-template-columns:1fr}
   .field-row{border-right:none}
@@ -110,194 +105,270 @@ footer a{color:#5a4a30;text-decoration:none}
   .field-row:last-child{border-bottom:none}
   .step{flex-direction:column}
   .step-num{width:100%;height:48px;font-size:1.5rem}
+  .mode-row{grid-template-columns:1fr}
+  .mode-label{border-right:none;border-bottom:1px solid #1e1a14;flex-direction:row;justify-content:flex-start;padding:10px 20px}
 }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-ornament">
-    <div class="orn-line"></div>
-    <div class="orn-diamond"></div>
-    <div class="orn-line r"></div>
-  </div>
+  <div class="hero-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line r"></div></div>
   <div class="hero-tag">New York · Broadway · Autopilot</div>
   <h1>Broadway<br><em>Lottery</em></h1>
   <p class="hero-sub">The Tampermonkey userscript that automatically enters Broadway lotteries for you — by Javier Castello</p>
   <div class="hero-badges">
     <span class="badge green">✓ Broadway Direct</span>
     <span class="badge green">✓ Lucky Seat</span>
-    <span class="badge">Telecharge — coming soon</span>
+    <span class="badge green">✓ Telecharge</span>
     <span class="badge gold">Free · Open source</span>
   </div>
   <div class="hero-scroll">Scroll to install</div>
 </section>
 
-<!-- DOWNLOAD -->
+<section style="padding:80px 24px;border-bottom:1px solid #1e1a14;background:#0d0b09">
+  <div class="container">
+    <div class="section-label">What is this?</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:600;color:#f0e6d0;margin-bottom:24px;line-height:1.2">Broadway shows raffle cheap tickets every day — this bot enters for you</h2>
+    <p style="font-size:15px;color:#8a7a60;line-height:1.8;max-width:680px;margin-bottom:20px">Most Broadway shows offer a daily <strong style="color:#d4c4a0">digital lottery</strong>: a limited number of tickets at a heavily discounted price (usually $35–$49, compared to $150–$400 face value) are raffled off to anyone who enters their name. The lottery opens the day before each performance and closes a few hours later. Winners are notified by email and have about 60 minutes to pay.</p>
+    <p style="font-size:15px;color:#8a7a60;line-height:1.8;max-width:680px;margin-bottom:20px">The catch: you have to enter <strong style="color:#d4c4a0">every single day</strong>, for every show you want to see, across multiple websites (Broadway Direct, Lucky Seat, Telecharge). Each entry takes a few minutes of form-filling. It adds up fast if you're trying to see several shows.</p>
+    <p style="font-size:15px;color:#8a7a60;line-height:1.8;max-width:680px;margin-bottom:32px">This script automates that entire process. You set up your info once, select which shows you want to enter, and click one button. The bot opens every lottery page, fills every form, and submits your entries — all in under a minute. You just need to solve a reCAPTCHA when one appears.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <div style="background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px">
+        <div style="font-size:22px;margin-bottom:8px">🎭</div>
+        <div style="font-size:13px;font-weight:600;color:#d4c4a0;margin-bottom:4px">26 shows supported</div>
+        <div style="font-size:12px;color:#6a5a40">All major Broadway lotteries available on bwayrush.com</div>
+      </div>
+      <div style="background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px">
+        <div style="font-size:22px;margin-bottom:8px">⚡</div>
+        <div style="font-size:13px;font-weight:600;color:#d4c4a0;margin-bottom:4px">Under 1 minute daily</div>
+        <div style="font-size:12px;color:#6a5a40">Enter all your shows in seconds instead of filling forms manually</div>
+      </div>
+      <div style="background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px">
+        <div style="font-size:22px;margin-bottom:8px">🔒</div>
+        <div style="font-size:13px;font-weight:600;color:#d4c4a0;margin-bottom:4px">Runs locally</div>
+        <div style="font-size:12px;color:#6a5a40">Your data never leaves your computer — no accounts, no servers</div>
+      </div>
+      <div style="background:#111009;border:1px solid #1e1a14;border-radius:6px;padding:18px 20px">
+        <div style="font-size:22px;margin-bottom:8px">💰</div>
+        <div style="font-size:13px;font-weight:600;color:#d4c4a0;margin-bottom:4px">$35–$49 tickets</div>
+        <div style="font-size:12px;color:#6a5a40">Win seats that normally cost $150–$400 or more</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="download-section">
   <div class="container">
     <div class="section-label">One-click install</div>
     <h2>Get the script</h2>
     <p>Download the userscript and Tampermonkey will install it automatically.</p>
-    <a class="download-btn" href="https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js">
-      ⬇ &nbsp; Download Broadway Lottery Autopilot
-    </a>
-    <p class="download-note">
-      Version 13.0 &nbsp;·&nbsp; Requires <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> &nbsp;·&nbsp; Works on Chrome, Firefox, Edge
-    </p>
+    <a class="download-btn" href="https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js">⬇ &nbsp; Download Broadway Lottery Autopilot</a>
+    <p class="download-note">Version 13.1 &nbsp;·&nbsp; Requires <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> &nbsp;·&nbsp; Chrome, Firefox, Edge</p>
   </div>
 </section>
 
 <div class="container">
 
-<!-- INSTALL -->
 <section class="section">
   <div class="section-label">Getting started</div>
   <h2>Installation in 5 steps</h2>
+
+  <div class="alert">
+    <div class="alert-title">⚠ Before you start — create your accounts</div>
+    <p>Some platforms require you to be logged in for the bot to work. Create these free accounts before installing:</p>
+    <div class="platform-row"><span class="plat-label green">✓ Broadway Direct</span><span class="plat-desc">No account needed. The bot fills the form automatically and your data is saved locally — you only enter it once.</span></div>
+    <div class="platform-row"><span class="plat-label gold">★ Lucky Seat</span><span class="plat-desc">Free account required. Sign up at <a href="https://www.luckyseat.com/" target="_blank">luckyseat.com</a> using the same name and email you'll set in the bot. You must be logged in when the bot runs.</span></div>
+    <div class="platform-row"><span class="plat-label gold">★ Telecharge</span><span class="plat-desc">Free account required. Sign up and stay logged in at <a href="https://my.socialtoaster.com" target="_blank">my.socialtoaster.com</a> using the same email you set in the bot.</span></div>
+  </div>
+
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
         <h3>Install Tampermonkey</h3>
-        <p>Go to <a href="https://www.tampermonkey.net/" target="_blank">tampermonkey.net</a> and click <strong style="color:#d4c4a0">Download</strong> — choose Chrome, Firefox or Edge. A small popup will appear asking you to confirm — click <strong style="color:#d4c4a0">Add extension</strong>. It's completely free.</p>
+        <p>Go to <a href="https://www.tampermonkey.net/" target="_blank">tampermonkey.net</a> and click <strong style="color:#d4c4a0">Download</strong> for your browser (Chrome, Firefox, or Edge). A popup will ask you to confirm — click <strong style="color:#d4c4a0">Add extension</strong>. It's completely free.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h3>Allow Tampermonkey to run scripts — required for Chrome</h3>
-        <p>Right-click the Tampermonkey icon in the top-right of Chrome → click <strong style="color:#d4c4a0">Manage extension</strong>. On that page, find the toggle <strong style="color:#d4c4a0">Allow User Scripts</strong> and turn it on. That's it — only needed once.</p>
+        <h3>Allow Tampermonkey to run scripts — Chrome only</h3>
+        <p>This one-time step is required on Chrome. Right-click the Tampermonkey icon in the top-right corner of your browser → click <strong style="color:#d4c4a0">Manage extension</strong>. On that page, find the toggle <strong style="color:#d4c4a0">Allow User Scripts</strong> and turn it on.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
         <h3>Download and install the script</h3>
-        <p>Click the big <strong style="color:#d4c4a0">⬇ Download</strong> button at the top of this page. A new tab will open showing the script code — Tampermonkey will detect it automatically and show an <strong style="color:#d4c4a0">Install</strong> button at the top. Click it to confirm. The tab will close and the script is ready.</p>
+        <p>Click the <strong style="color:#d4c4a0">⬇ Download</strong> button at the top of this page. A new tab will open — Tampermonkey detects the script automatically and shows an <strong style="color:#d4c4a0">Install</strong> button. Click it to confirm. Done.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
         <h3>Fill in your personal data</h3>
-        <p>Go to <a href="https://bwayrush.com" target="_blank">bwayrush.com</a>. You'll see a gold 🎭 button in the bottom-right corner of the screen. Click it to open the panel, then click <strong style="color:#d4c4a0">My Data</strong> to expand it. Fill in your first name, last name, email, date of birth (MM/DD/YYYY), and zip code. Your data is saved automatically in your browser — you only need to do this once.</p>
+        <p>Go to <a href="https://bwayrush.com" target="_blank">bwayrush.com</a>. A gold 🎭 button appears in the bottom-right corner. Click it to open the panel, then click <strong style="color:#d4c4a0">My Data</strong> to expand the settings. Fill in your details — this is done only once, your data is saved automatically in your browser.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-body">
         <h3>Select shows and launch</h3>
-        <p>Check the shows you want to enter by clicking on them — they'll highlight in gold. Then click <strong style="color:#d4c4a0">🚀 Open lotteries</strong>. Each lottery page will open in a new tab and fill itself out automatically. Just solve the reCAPTCHA if one appears and the bot handles the rest.</p>
+        <p>Click on the shows you want to enter — they highlight in gold when selected. Choose <strong style="color:#d4c4a0">◎ Manual</strong> or <strong style="color:#d4c4a0">⚡ Auto</strong> mode (explained below), then click <strong style="color:#d4c4a0">🚀 Open lotteries</strong>. Each lottery opens in a new tab and is handled automatically.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CONFIG -->
 <section class="section">
   <div class="section-label">Configuration</div>
   <h2>Panel fields explained</h2>
   <div class="panel-table">
-    <div class="panel-table-hdr">⚙ My Data</div>
+    <div class="panel-table-hdr">⚙ My Data — fill this in once, it's saved forever</div>
     <div class="panel-fields">
-      <div class="field-row"><div class="field-name">Nombre / Apellido</div><div class="field-desc">Your legal first and last name — must match your photo ID at the box office</div></div>
-      <div class="field-row"><div class="field-name">Email</div><div class="field-desc">Where you'll receive win/loss notifications from each lottery</div></div>
-      <div class="field-row"><div class="field-name">Zip</div><div class="field-desc">Your 5-digit US zip code (e.g. 10027 for Harlem)</div></div>
-      <div class="field-row"><div class="field-name">País</div><div class="field-desc">Country of residence — 🇺🇸 USA for US residents</div></div>
-      <div class="field-row"><div class="field-name">Teléfono</div><div class="field-desc">Optional — used for SMS winner notifications on some platforms</div></div>
-      <div class="field-row"><div class="field-name">Tickets</div><div class="field-desc">1 or 2 tickets — applied automatically to all platforms</div></div>
-      <div class="field-row"><div class="field-name">Fecha de nacimiento</div><div class="field-desc">MM / DD / YYYY format — required by most Broadway lotteries</div></div>
-      <div class="field-row"><div class="field-name">Lucky Seat horarios</div><div class="field-desc">🕐 All · 🌙 Nights only (5pm+) · ☀️ Mornings only. Weekends always get all showtimes.</div></div>
+      <div class="field-row"><div class="field-name">First name</div><div class="field-desc">Your legal first name — must match your photo ID at the box office</div></div>
+      <div class="field-row"><div class="field-name">Last name</div><div class="field-desc">Your legal last name — must match your photo ID at the box office</div></div>
+      <div class="field-row"><div class="field-name">Email</div><div class="field-desc">Where win/loss notifications are sent. Use the same email as your Lucky Seat and Telecharge accounts</div></div>
+      <div class="field-row"><div class="field-name">Zip</div><div class="field-desc">Your 5-digit US zip code (e.g. 10036 for Midtown Manhattan)</div></div>
+      <div class="field-row"><div class="field-name">Country</div><div class="field-desc">Your country of residence — USA for US residents</div></div>
+      <div class="field-row"><div class="field-name">Phone</div><div class="field-desc">Optional — used for SMS winner notifications on some platforms</div></div>
+      <div class="field-row"><div class="field-name">Tickets</div><div class="field-desc">1 or 2 tickets per entry — applied to all platforms. You cannot change this after entering</div></div>
+      <div class="field-row"><div class="field-name">Date of birth</div><div class="field-desc">MM / DD / YYYY — required by most lottery platforms to verify your identity</div></div>
+      <div class="field-row" style="grid-column:1/-1"><div class="field-name">Showtimes filter</div><div class="field-desc">Controls which performances are selected on Lucky Seat: 🕐 All — selects every available performance · 🌙 Nights only — only shows at 5pm or later · ☀️ Mornings only — only matinées before 5pm. Weekend shows (Saturday and Sunday) are always fully selected regardless of this setting.</div></div>
     </div>
   </div>
 </section>
 
-<!-- PLATFORMS -->
+<section class="section">
+  <div class="section-label">Auto vs Manual</div>
+  <h2>Choosing your mode</h2>
+  <p style="font-size:14px;color:#8a7a60;margin-bottom:24px">The <strong style="color:#d4c4a0">◎ Manual / ⚡ Auto</strong> toggle in the filter bar applies to all selected shows at once. Here's what each mode does:</p>
+  <div class="mode-box">
+    <div class="mode-row">
+      <div class="mode-label"><span class="mode-tag manual">◎ Manual</span></div>
+      <div class="mode-body">
+        <h4>Opens and fills — you click Enter</h4>
+        <p>The bot opens each lottery page in a new tab and fills in all the form fields (name, email, date of birth, zip, tickets). It stops there and waits. You review the form, solve the reCAPTCHA if one appears, and click <strong style="color:#d4c4a0">Enter</strong> yourself. Use this mode when you want to double-check each entry before submitting, or when a show has specific requirements you want to review.</p>
+      </div>
+    </div>
+    <div class="mode-row">
+      <div class="mode-label"><span class="mode-tag auto">⚡ Auto</span></div>
+      <div class="mode-body">
+        <h4>Opens, fills, and submits automatically</h4>
+        <p>The bot opens each lottery page, fills the entire form, and clicks Enter without any input from you. If a reCAPTCHA appears, it pauses and asks you to solve it — then continues automatically. Use this mode for your daily routine when you trust the settings and want to enter as many lotteries as possible with minimal effort. After launching, you only need to solve captchas when they appear.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="section-label">How it works</div>
-  <h2>Platform behaviour</h2>
+  <h2>What the bot does on each platform</h2>
   <div class="plat-grid">
     <div class="plat-card">
       <h3>Broadway Direct <span class="plat-badge">Auto</span></h3>
       <ul>
-        <li>Opens each "ENTER NOW" lottery in sequence</li>
-        <li>Auto-fills name, email, DOB, zip, country, tickets</li>
-        <li>No reCAPTCHA → clicks ENTER automatically</li>
-        <li>reCAPTCHA → waits for you, then continues</li>
-        <li>Detects SUCCESS modal, closes it, moves to next show</li>
-        <li>Shows a clear message if no open lotteries found</li>
+        <li>Runs on lottery.broadwaydirect.com when you open a show page</li>
+        <li>Finds all "ENTER NOW" buttons and processes them one by one</li>
+        <li>Fills name, email, date of birth, zip, country and tickets automatically</li>
+        <li>In Auto mode: clicks Enter if no captcha is present</li>
+        <li>In Manual mode: fills the form and waits for you to click Enter</li>
+        <li>After each submission, detects the success screen and moves to the next show</li>
+        <li>If no lotteries are open, shows a message explaining why</li>
       </ul>
     </div>
     <div class="plat-card">
       <h3>Lucky Seat <span class="plat-badge">Auto</span></h3>
       <ul>
-        <li>Runs on any luckyseat.com/shows/... page</li>
-        <li>Selects performances by your time-of-day filter</li>
-        <li>Weekends (Sat/Sun) always get all showtimes</li>
-        <li>Skips already-entered slots (shown in red)</li>
-        <li>Tells you if all your filter's slots are entered</li>
-        <li>Auto-submits when no captcha is present</li>
+        <li>Runs on any luckyseat.com/shows/... page when you open it</li>
+        <li>Selects performances based on your Showtimes filter setting</li>
+        <li>Weekend shows (Sat/Sun) are always fully selected regardless of filter</li>
+        <li>Skips performances already entered (shown in red — disabled buttons)</li>
+        <li>Shows a message if all performances for your filter are already entered</li>
+        <li>In Auto mode: clicks Submit Entry if no captcha is present</li>
+        <li>In Manual mode: selects performances and sets tickets, waits for you to submit</li>
       </ul>
     </div>
-    <div class="plat-card coming">
-      <h3>Telecharge <span class="plat-badge soon">Soon</span></h3>
+    <div class="plat-card">
+      <h3>Telecharge <span class="plat-badge">Auto</span></h3>
       <ul>
-        <li>Support in development</li>
-        <li>Will be added in a future version</li>
-        <li>Check back for updates</li>
+        <li>Runs on my.socialtoaster.com — all shows appear on a single page</li>
+        <li>Reads which show you selected in the panel and only enters that one</li>
+        <li>Sets the ticket count to match your preference</li>
+        <li>In Auto mode: clicks Enter for that show automatically</li>
+        <li>In Manual mode: sets tickets and highlights the correct show — you click Enter</li>
+        <li>Shows a message if that show is not listed or already entered</li>
+        <li>Requires being logged in at my.socialtoaster.com</li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- TIPS -->
 <section class="section">
   <div class="section-label">Best practices</div>
   <h2>Tips for more wins</h2>
   <div class="tips">
-    <div class="tip"><div class="tip-icon">🎯</div><div class="tip-text"><strong>Enter every day.</strong> Lotteries reset per performance. Consistency dramatically increases your odds over time.</div></div>
-    <div class="tip"><div class="tip-icon">📬</div><div class="tip-text"><strong>Watch your email.</strong> You usually have only 60 minutes to claim your tickets after winning. Don't miss the window.</div></div>
-    <div class="tip"><div class="tip-icon">🌙</div><div class="tip-text"><strong>Try matinées.</strong> Evening shows have more competition. Morning/afternoon lotteries tend to have better odds.</div></div>
-    <div class="tip"><div class="tip-icon">🎭</div><div class="tip-text"><strong>Enter multiple shows.</strong> You can win tickets to more than one show for the same night — enter as many as you want.</div></div>
-    <div class="tip"><div class="tip-icon">🪪</div><div class="tip-text"><strong>Use your real name.</strong> Winners must show photo ID at the box office. Nicknames get your tickets cancelled.</div></div>
-    <div class="tip"><div class="tip-icon">🔄</div><div class="tip-text"><strong>Lucky Seat re-entry is safe.</strong> Your latest entry automatically replaces the previous one — no risk of disqualification.</div></div>
+    <div class="tip"><div class="tip-icon">🎯</div><div class="tip-text"><strong>Enter every day.</strong> Lotteries reset per performance. Consistent daily entries dramatically increase your odds over time.</div></div>
+    <div class="tip"><div class="tip-icon">📬</div><div class="tip-text"><strong>Watch your email closely.</strong> You have about 60 minutes to claim your tickets after winning. Missing the window means losing the tickets.</div></div>
+    <div class="tip"><div class="tip-icon">🌙</div><div class="tip-text"><strong>Try matinées.</strong> Evening shows attract far more entrants. Morning and afternoon performances typically have better odds.</div></div>
+    <div class="tip"><div class="tip-icon">🎭</div><div class="tip-text"><strong>Enter multiple shows.</strong> You can win tickets to more than one show for the same night. Select as many as you want.</div></div>
+    <div class="tip"><div class="tip-icon">🪪</div><div class="tip-text"><strong>Use your real legal name.</strong> Winners must show a matching photo ID at the box office. Any mismatch will get your tickets cancelled.</div></div>
+    <div class="tip"><div class="tip-icon">🔄</div><div class="tip-text"><strong>Lucky Seat re-entry is safe.</strong> Your latest entry replaces the previous one automatically — no risk of disqualification.</div></div>
   </div>
 </section>
 
-<!-- FAQ -->
+<div class="divider"></div>
+
+<section class="section">
+  <div class="section-label">Privacy</div>
+  <h2>Your data stays on your computer</h2>
+  <div class="tips">
+    <div class="tip"><div class="tip-icon">🔒</div><div class="tip-text"><strong>Runs 100% locally.</strong> The script runs entirely inside your own browser. No data is ever sent to any external server — not to us, not to anyone.</div></div>
+    <div class="tip"><div class="tip-icon">💾</div><div class="tip-text"><strong>Stored only on your device.</strong> Your name, email, date of birth and zip are saved in Tampermonkey's local storage on your computer only. No one else can access this.</div></div>
+    <div class="tip"><div class="tip-icon">📋</div><div class="tip-text"><strong>Goes directly to the lottery.</strong> When the bot fills a form and submits it, your data goes straight to Broadway Direct, Lucky Seat, or Telecharge — exactly as if you typed it yourself.</div></div>
+    <div class="tip"><div class="tip-icon">👁</div><div class="tip-text"><strong>Open source.</strong> The full script code is publicly visible on GitHub. You can read exactly what it does — no hidden functions, no tracking, no analytics of any kind.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section class="section">
   <div class="section-label">FAQ</div>
   <h2>Questions & answers</h2>
   <div class="faq">
     <div class="faq-item">
-      <div class="faq-q">Is this script safe? Will I get banned? <span class="faq-arrow">›</span></div>
+      <div class="faq-q">Is this script safe to use? Will I get banned? <span class="faq-arrow">›</span></div>
       <div class="faq-a">The script runs entirely in your browser and stores no data externally. It mimics normal human behavior — filling forms and clicking buttons. That said, lottery terms of service prohibit automated entries. Use at your own discretion.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Why does it sometimes ask me to solve a reCAPTCHA? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">reCAPTCHA requires human interaction and can't be bypassed for free. When detected, the script fills everything else and waits for you to click "I'm not a robot." Many sessions have no captcha at all — in those cases it submits fully automatically.</div>
+      <div class="faq-a">reCAPTCHA is a challenge designed to detect bots and requires human interaction. It cannot be bypassed automatically. When detected, the script fills everything else and waits for you to click "I'm not a robot." Many sessions have no captcha at all — in those cases the script submits fully automatically.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">Broadway Direct shows no ENTER NOW buttons — what happened? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">A banner appears after a few seconds explaining the reason: all lotteries may be <strong>Closed</strong> or <strong>Upcoming</strong>, you may have <strong>already entered</strong>, or the lottery hasn't opened yet. Check the schedule shown on the show page.</div>
+      <div class="faq-q">What's the difference between Auto and Manual mode? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">In <strong>Manual</strong> mode the bot opens each page and fills the form, but you click Enter yourself. In <strong>Auto</strong> mode the bot fills the form and clicks Enter automatically — you only need to intervene if a reCAPTCHA appears. You switch between them using the ◎ Manual / ⚡ Auto toggle in the panel before launching.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Broadway Direct shows no "ENTER NOW" buttons — what happened? <span class="faq-arrow">›</span></div>
+      <div class="faq-a">A banner appears after a few seconds explaining the possible reason: all lotteries may be <strong>Closed</strong> or <strong>Upcoming</strong>, you may have <strong>already entered</strong> all available performances, or the lottery window hasn't opened yet. Check the schedule shown on the show page.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Lucky Seat says "already entered all performances" — what does that mean? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">All performances matching your time filter (morning/evening) are already entered — they appear in red on the page. Nothing left to do for this show. Check your email for results, or try a different show.</div>
+      <div class="faq-a">All performances that match your Showtimes filter (mornings/evenings) are already entered — they appear as red disabled buttons on the page. There's nothing left to do for this show today. Check your email for results, or try a different show.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Can I enter the same show twice? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">On <strong>Broadway Direct</strong>, duplicate entries for the same performance are disqualified. On <strong>Lucky Seat</strong>, your latest entry automatically replaces the previous one — re-entering is completely safe.</div>
+      <div class="faq-a">On <strong>Broadway Direct</strong>, submitting duplicate entries for the same performance results in disqualification. On <strong>Lucky Seat</strong>, your latest entry automatically replaces the previous one — re-entering is completely safe. On <strong>Telecharge</strong>, the bot detects if you've already entered and skips the show.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">I won! What do I do next? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">Check your email immediately — you have about <strong>60 minutes</strong> to claim and pay via credit card. On Broadway Direct check your status at lottery.broadwaydirect.com. On Lucky Seat, log into your account dashboard.</div>
+      <div class="faq-a">Check your email immediately — you have about <strong>60 minutes</strong> to claim and pay for your tickets via credit card. On Broadway Direct you can also check your status at lottery.broadwaydirect.com. On Lucky Seat, log into your account dashboard. Missing the payment window means your tickets are released to another winner.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Why are TodayTix and Hamilton not supported? <span class="faq-arrow">›</span></div>
-      <div class="faq-a">TodayTix requires a native mobile app. Hamilton's lottery uses its own platform with strong anti-bot protections. Both are intentionally excluded.</div>
+      <div class="faq-a">TodayTix requires a native mobile app — their lottery is not available on the web. Hamilton's lottery is managed through its own dedicated platform with strong anti-bot protections. Both are intentionally excluded from this script.</div>
     </div>
   </div>
 </section>
@@ -305,12 +376,8 @@ footer a{color:#5a4a30;text-decoration:none}
 </div>
 
 <footer>
-  <div class="footer-ornament">
-    <div class="orn-line"></div>
-    <div class="orn-diamond"></div>
-    <div class="orn-line r"></div>
-  </div>
-  <p>Broadway Lottery Autopilot &nbsp;·&nbsp; v13.0 &nbsp;·&nbsp; by Javier Castello</p>
+  <div class="footer-ornament"><div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line r"></div></div>
+  <p>Broadway Lottery Autopilot &nbsp;·&nbsp; v13.1 &nbsp;·&nbsp; by Javier Castello</p>
   <p style="margin-top:6px">For personal use only &nbsp;·&nbsp; Not affiliated with Broadway Direct, Lucky Seat, or Telecharge</p>
 </footer>
 
