@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      13.2
+// @version      13.3
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -616,16 +616,27 @@
       loadShowImages(shows, (show) => {
         const wrap = shadow.querySelector(`.pw[data-show="${CSS.escape(show.name)}"]`);
         if (!wrap) return;
-        let img = wrap.querySelector('.pi');
-        if (!img) {
-          img = document.createElement('img');
-          img.className = 'pi';
-          img.alt = '';
-          img.loading = 'lazy';
-          img.onerror = () => img.style.display = 'none';
-          wrap.appendChild(img);
+        if (show.img) {
+          let img = wrap.querySelector('.pi');
+          if (!img) {
+            img = document.createElement('img');
+            img.className = 'pi';
+            img.alt = '';
+            img.loading = 'lazy';
+            img.onerror = () => img.style.display = 'none';
+            wrap.appendChild(img);
+          }
+          img.src = show.img;
         }
-        img.src = show.img;
+        if (show.perf) {
+          const info = wrap.closest('.card')?.querySelector('.info');
+          if (info && !info.querySelector('.perf')) {
+            const perfEl = document.createElement('div');
+            perfEl.className = 'perf';
+            perfEl.textContent = `${show.perf} performances`;
+            info.querySelector('.sn').after(perfEl);
+          }
+        }
       });
     }
 
