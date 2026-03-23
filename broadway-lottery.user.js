@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.2
+// @version      14.3
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -18,6 +18,7 @@
 // @connect      lottery.broadwaydirect.com
 // @connect      my.socialtoaster.com
 // @connect      www.luckyseat.com
+// @connect      luckyseat.com
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -475,7 +476,8 @@
         results.forEach((html, j) => {
           const { show, url: itemUrl, platform } = batch[j];
           console.log('[AP]', platform, show.name, 'fetch length=', html?.length, 'url=', itemUrl);
-          if (!html || html.length < 5000) {
+          const minLength = platform === 'Lucky Seat' ? 5000 : 500;
+          if (!html || html.length < minLength) {
             // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
             if (platform === 'Lucky Seat') {
               try {
