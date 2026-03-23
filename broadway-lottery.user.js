@@ -657,7 +657,7 @@
             const btn = [...document.querySelectorAll('input[type="submit"],button[type="submit"],button')].find(b => b.offsetParent !== null && /^(ENTER|SUBMIT)$/i.test((b.value||b.textContent).trim()));
             if (btn) { ind.textContent = `🎭 ✓ ${count} fields — submitting...`; document.body.appendChild(ind); setTimeout(() => ind.remove(), 8000); setTimeout(() => btn.click(), 500); }
           } else {
-            ind.textContent = `🎭 ✓ ${count} fields — solve reCAPTCHA then click ENTER`;
+            ind.textContent = `🎭 ✓ ${count} fields — click "I'm not a robot" then click ENTER`;
             document.body.appendChild(ind);
             setTimeout(() => ind.remove(), 15000);
           }
@@ -805,7 +805,7 @@
             showIndicator('✓ All done — submitting automatically...', '#48bb78');
             setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 600);
           } else {
-            showIndicator('✓ Performances selected & tickets set — solve reCAPTCHA then click <b style="color:#fff">Submit Entry</b>', '#ecc94b');
+            showIndicator('✓ Performances selected & tickets set — click "I\'m not a robot" then <b style="color:#fff">Submit Entry</b>', '#ecc94b');
           }
         }, delay);
       }, 500);
