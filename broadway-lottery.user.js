@@ -15,6 +15,9 @@
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @connect      en.wikipedia.org
+// @connect      lottery.broadwaydirect.com
+// @connect      my.socialtoaster.com
+// @connect      www.luckyseat.com
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -271,6 +274,86 @@
     return shows;
   }
 
+  function normalizeShowName(name) {
+    return name.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+  }
+
+  function formatTime(raw) {
+    // raw: "7:00 PM" or "8:30 PM" → "7pm" or "8:30pm"
+    const m = raw.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return raw.trim().toLowerCase();
+    const h = m[1], min = m[2], ampm = m[3].toLowerCase();
+    return min === '00' ? `${h}${ampm}` : `${h}:${min}${ampm}`;
+  }
+
+  function parseDayAbbr(dateStr) {
+    // dateStr: "Tuesday, March 24, 2026" → { day: "Tue", date: 24 }
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    try {
+      const d = new Date(dateStr);
+      return { day: days[d.getDay()], date: d.getDate() };
+    } catch { return null; }
+  }
+
+  function parseTelechargeDate(html) {
+    // Returns array of {day, date, time} from Telecharge show card HTML
+    const dates = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.querySelectorAll('.lottery_show_date, [class*="date"], [class*="time"]').forEach(el => {
+      const text = el.textContent.trim();
+      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+/);
+      const timeMatch = text.match(/\d+:\d+\s*[AP]M/i);
+      if (dateMatch && timeMatch) {
+        const parsed = parseDayAbbr(dateMatch[0]);
+        if (parsed) dates.push({ ...parsed, time: formatTime(timeMatch[0]) });
+      }
+    });
+    return dates;
+  }
+
+  function parseLuckySeatDates(html) {
+    // Returns array of {day, date, time} from Lucky Seat show page HTML
+    const dates = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // Lucky Seat shows dates in rows: "Tuesday, March 24, 2026" with time buttons "7:00 PM"
+    doc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const row = cb.closest('li, tr, div') || cb.parentElement;
+      if (!row) return;
+      const text = row.textContent || '';
+      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
+      const timeMatches = [...text.matchAll(/\d+:\d+\s*[AP]M/gi)];
+      if (dateMatch) {
+        const parsed = parseDayAbbr(dateMatch[0]);
+        if (!parsed) return;
+        if (timeMatches.length === 0) {
+          dates.push({ ...parsed, time: '' });
+        } else {
+          timeMatches.forEach(tm => dates.push({ ...parsed, time: formatTime(tm[0]) }));
+        }
+      }
+    });
+    return dates;
+  }
+
+  function parseBroadwayDirectDates(html) {
+    // Returns array of {day, date, time} from Broadway Direct lottery page HTML
+    const dates = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.querySelectorAll('[class*="date"],[class*="perf"],[class*="show-time"]').forEach(el => {
+      const text = el.textContent.trim();
+      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+/);
+      const timeMatch = text.match(/\d+:\d+\s*[AP]M/i);
+      if (dateMatch) {
+        const parsed = parseDayAbbr(dateMatch[0]);
+        if (parsed) dates.push({ ...parsed, time: timeMatch ? formatTime(timeMatch[0]) : '' });
+      }
+    });
+    return dates;
+  }
+
   function loadShowImages(shows, rerenderCard) {
     shows.forEach(show => {
       GM_xmlhttpRequest({
@@ -307,6 +390,89 @@
         }
       });
     });
+  }
+
+  function loadShowDates(shows, rerenderCard) {
+    // Build list of {show, url, platform} to fetch — one entry per lottery URL
+    const toFetch = [];
+    const tcShows = []; // Telecharge: all on one page
+    shows.forEach(show => {
+      show.links.forEach(link => {
+        if (link.platform === 'Telecharge') {
+          if (!tcShows.includes(show)) tcShows.push(show);
+        } else {
+          toFetch.push({ show, url: link.url, platform: link.platform });
+        }
+      });
+    });
+
+    // Telecharge: 1 request for all shows
+    if (tcShows.length) {
+      new Promise(resolve => {
+        GM_xmlhttpRequest({
+          method: 'GET', anonymous: false,
+          url: 'https://my.socialtoaster.com/lottery_select/?key=BROADWAY',
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          onload(res) { resolve(res.responseText); },
+          onerror() { resolve(''); }
+        });
+      }).then(html => {
+        if (!html || html.length < 1000) return;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        tcShows.forEach(show => {
+          const card = [...doc.querySelectorAll('div.lottery_show')].find(c =>
+            (c.querySelector('.lottery_show_title')?.textContent || '').toLowerCase().includes(show.name.toLowerCase().slice(0, 10))
+          );
+          if (!card) return;
+          const dates = parseTelechargeDate(card.outerHTML);
+          if (dates.length) { show.dates = dates; rerenderCard(show); }
+        });
+      });
+    }
+
+    // Broadway Direct + Lucky Seat: batches of 5 parallel
+    function gmFetch(url) {
+      return new Promise(resolve => {
+        GM_xmlhttpRequest({
+          method: 'GET', anonymous: false,
+          url,
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          onload(res) { resolve(res.responseText || ''); },
+          onerror() { resolve(''); },
+          ontimeout() { resolve(''); }
+        });
+      });
+    }
+
+    async function processBatches() {
+      for (let i = 0; i < toFetch.length; i += 5) {
+        const batch = toFetch.slice(i, i + 5);
+        const results = await Promise.all(batch.map(item => gmFetch(item.url)));
+        results.forEach((html, j) => {
+          const { show, platform } = batch[j];
+          if (!html || html.length < 1000) {
+            // Lucky Seat: try cache
+            if (platform === 'Lucky Seat') {
+              try {
+                const cached = JSON.parse(GM_getValue('ls_dates_' + normalizeShowName(show.name), '{}'));
+                if (cached.dates && cached.savedAt && (Date.now() - cached.savedAt) < 86400000) {
+                  show.dates = cached.dates;
+                  rerenderCard(show);
+                }
+              } catch {}
+            }
+            return;
+          }
+          let dates = [];
+          if (platform === 'Broadway Direct') dates = parseBroadwayDirectDates(html);
+          if (platform === 'Lucky Seat')      dates = parseLuckySeatDates(html);
+          if (dates.length) { show.dates = dates; rerenderCard(show); }
+        });
+      }
+    }
+
+    processBatches();
   }
 
   function runBwayRush() {
@@ -404,6 +570,8 @@
         .card:hover .sn{color:#f0e6d0}
         .perf{font-size:9px;color:#6a5a3a;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .card.sel .perf{color:#a08840;}
+        .dates-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;}
+        .chip{font-size:10px;color:#8a7a60;background:#1a1610;border:1px solid rgba(201,151,58,.3);border-radius:3px;padding:1px 5px;white-space:nowrap;}
         .meta{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;gap:4px;align-items:center}
         .pbd{color:#6a8aaa}.pls{color:#5a8a6a}.ptc{color:#8a6aaa}
         .dot{width:2px;height:2px;border-radius:50%;background:#3a3020;display:inline-block;flex-shrink:0}
@@ -529,6 +697,7 @@
                   <div class="info">
                     <div class="sn">${s.name}</div>
                     ${s.perf ? `<div class="perf">${s.perf} performances</div>` : ''}
+                    ${s.dates && s.dates.length ? `<div class="dates-row">${s.dates.map(d=>`<span class="chip">${d.day} ${d.date}${d.time?' · '+d.time:''}</span>`).join('')}</div>` : ''}
                     <div class="meta">${plats.map(p=>`<span class="${p==='Broadway Direct'?'pbd':p==='Lucky Seat'?'pls':'ptc'}">${p}</span>`).join('')}${prices.length?`<span class="dot"></span><span class="pr">${prices.join('/')}</span>`:''}</div>
                   </div>
                   <div class="side">
@@ -636,6 +805,33 @@
             perfEl.textContent = `${show.perf} performances`;
             info.querySelector('.sn').after(perfEl);
           }
+        }
+        if (show.dates && show.dates.length) {
+          const card = wrap.closest('.card');
+          if (!card) return;
+          const info = card.querySelector('.info');
+          if (!info) return;
+          let row = info.querySelector('.dates-row');
+          if (!row) { row = document.createElement('div'); row.className = 'dates-row'; info.appendChild(row); }
+          row.innerHTML = show.dates.map(d =>
+            `<span class="chip">${d.day} ${d.date}${d.time ? ' · ' + d.time : ''}</span>`
+          ).join('');
+        }
+      });
+
+      loadShowDates(shows, (show) => {
+        const wrap = shadow.querySelector(`.pw[data-show="${CSS.escape(show.name)}"]`);
+        if (!wrap) return;
+        if (show.dates && show.dates.length) {
+          const card = wrap.closest('.card');
+          if (!card) return;
+          const info = card.querySelector('.info');
+          if (!info) return;
+          let row = info.querySelector('.dates-row');
+          if (!row) { row = document.createElement('div'); row.className = 'dates-row'; info.appendChild(row); }
+          row.innerHTML = show.dates.map(d =>
+            `<span class="chip">${d.day} ${d.date}${d.time ? ' · ' + d.time : ''}</span>`
+          ).join('');
         }
       });
     }
@@ -804,6 +1000,31 @@
       if (!document.querySelectorAll('input[type="checkbox"]').length) return;
       if (!document.querySelector('button.c-btn--large, button[type="submit"]')) return;
       done = true;
+
+      // Save performance dates to cache for panel use
+      try {
+        const dateEls = [...document.querySelectorAll('input[type="checkbox"]')].map(cb => {
+          const row = cb.closest('li, tr, div') || cb.parentElement;
+          const text = row?.textContent || '';
+          const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
+          const timeMatches = [...text.matchAll(/\d+:\d+\s*[AP]M/gi)];
+          if (!dateMatch) return [];
+          const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          const d = new Date(dateMatch[0]);
+          const base = { day: days[d.getDay()], date: d.getDate() };
+          if (!timeMatches.length) return [{ ...base, time: '' }];
+          return timeMatches.map(tm => {
+            const m = tm[0].match(/(\d+):(\d+)\s*(AM|PM)/i);
+            const time = m ? (m[2] === '00' ? m[1] + m[3].toLowerCase() : m[1] + ':' + m[2] + m[3].toLowerCase()) : '';
+            return { ...base, time };
+          });
+        }).flat().filter(d => d.day);
+        if (dateEls.length) {
+          const showNameRaw = document.querySelector('h1, .show-title, [class*="show-name"]')?.textContent?.trim() || '';
+          const key = 'ls_dates_' + showNameRaw.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+          GM_setValue(key, JSON.stringify({ dates: dateEls, savedAt: Date.now() }));
+        }
+      } catch {}
 
       const result = selectPerformances();
 
