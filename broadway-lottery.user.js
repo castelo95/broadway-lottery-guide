@@ -451,8 +451,8 @@
         const results = await Promise.all(batch.map(item => gmFetch(item.url)));
         results.forEach((html, j) => {
           const { show, platform } = batch[j];
-          if (!html || html.length < 1000) {
-            // Lucky Seat: try cache
+          if (!html || html.length < 5000) {
+            // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
             if (platform === 'Lucky Seat') {
               try {
                 const cached = JSON.parse(GM_getValue('ls_dates_' + normalizeShowName(show.name), '{}'));
