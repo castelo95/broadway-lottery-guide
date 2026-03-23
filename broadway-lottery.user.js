@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.3
+// @version      14.4
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -431,13 +431,18 @@
         GM_xmlhttpRequest({
           method: 'GET', anonymous: false,
           url: 'https://my.socialtoaster.com/lottery_select/?key=BROADWAY',
-          headers: { 'User-Agent': 'Mozilla/5.0' },
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Referer': 'https://my.socialtoaster.com/',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5'
+          },
           onload(res) { resolve(res.responseText); },
           onerror() { resolve(''); }
         });
       }).then(html => {
-        console.log('[AP] Telecharge fetch: length=', html?.length, 'preview=', html?.slice(0,200));
-        if (!html || html.length < 1000) { console.log('[AP] Telecharge: too short, skipping'); return; }
+        console.log('[AP] Telecharge fetch: length=', html?.length, 'preview=', html?.slice(0,300));
+        if (!html || html.length < 1000 || html.includes('<title>SocialToaster | Error')) { console.log('[AP] Telecharge: error page or too short, skipping'); return; }
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const allCards = doc.querySelectorAll('div.lottery_show');
