@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.5
+// @version      14.6
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -52,6 +52,14 @@
   function saveDisabled(v) { GM_setValue('ap_disabled', JSON.stringify(v)); }
   function loadLsFilter() { return GM_getValue('ls_filter', 'all'); }
   function saveLsFilter(v) { GM_setValue('ls_filter', v); }
+  function loadBlockedDays() { try { return new Set(JSON.parse(GM_getValue('ap_blocked_days','[]'))); } catch { return new Set(); } }
+  function saveBlockedDays(s) { GM_setValue('ap_blocked_days', JSON.stringify([...s])); }
+  function dateToISO(dateStr) {
+    const clean = dateStr.replace(/^[A-Z][a-z]+day,?\s+/,'').replace(/,?\s*\d{4}\s*$/,'').trim();
+    const d = new Date(clean + ', ' + new Date().getFullYear());
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().slice(0,10);
+  }
 
   function setVal(el, val) {
     if (!el || !val) return false;
@@ -362,13 +370,18 @@
         .stat-n{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#c9973a}
         .stat-l{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#3a3020}
         .sep{width:1px;height:22px;background:#1e1a14}
-        details.cfg{border-bottom:1px solid #1a1610;flex-shrink:0}
-        details.cfg summary{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer;list-style:none;user-select:none}
-        details.cfg summary:hover{background:#111009}
-        details.cfg summary::after{content:'▸';margin-left:auto;color:#2a2018;font-size:9px;transition:transform .2s}
-        details.cfg[open] summary::after{transform:rotate(90deg)}
+        details.cfg,details.cal{border-bottom:1px solid #1a1610;flex-shrink:0}
+        details.cfg summary,details.cal summary{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer;list-style:none;user-select:none}
+        details.cfg summary:hover,details.cal summary:hover{background:#111009}
+        details.cfg summary::after,details.cal summary::after{content:'▸';margin-left:auto;color:#2a2018;font-size:9px;transition:transform .2s}
+        details.cfg[open] summary::after,details.cal[open] summary::after{transform:rotate(90deg)}
         .cfg-icon{width:14px;height:14px;border:1px solid #2a2018;border-radius:2px;display:flex;align-items:center;justify-content:center;color:#c9973a;font-size:9px}
         .cfg-label{font-size:9px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:#4a4030}
+        .cal-count{font-size:9px;color:#4a4030;letter-spacing:.5px}
+        .cal-chips{display:flex;flex-wrap:wrap;gap:4px;padding:4px 20px 12px;}
+        .day-chip{font-size:10px;padding:2px 7px;border-radius:3px;cursor:pointer;border:1px solid rgba(201,151,58,.15);background:#111009;color:#3a3020;transition:all .15s;user-select:none}
+        .day-chip.avail{color:#c9973a;border-color:rgba(201,151,58,.5);background:#1a1610}
+        .day-chip.today{font-weight:700}
         .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:4px 20px 14px}
         .f label{display:block;font-size:8px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#3a3020;margin-bottom:4px}
         .f input,.f select{width:100%;padding:7px 10px;border-radius:2px;border:1px solid #1e1a14;background:#0b0906;color:#c8b89a;font-size:12px;font-family:'Space Grotesk',sans-serif;outline:none}
@@ -492,6 +505,10 @@
               <div class="stat"><div class="stat-n">${new Date().toLocaleDateString('en-US',{weekday:'short'})}</div><div class="stat-l">${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div></div>
             </div>
           </div>
+          <details class="cal">
+            <summary><div class="cfg-icon">📅</div><span class="cfg-label">My Days</span><span class="cal-count" id="cal-count"></span></summary>
+            <div class="cal-chips" id="cal-chips"></div>
+          </details>
           <details class="cfg"${!ud.firstName?' open':''}>
             <summary><div class="cfg-icon">⚙</div><span class="cfg-label">My Data</span></summary>
             <div class="cgrid">
@@ -614,7 +631,39 @@
         };
       }
 
+      function renderCalendar() {
+        const blocked = loadBlockedDays();
+        const today = new Date(); today.setHours(0,0,0,0);
+        let changed = false;
+        blocked.forEach(iso => { if (new Date(iso) < today) { blocked.delete(iso); changed = true; } });
+        if (changed) saveBlockedDays(blocked);
+        const chips = shadow.getElementById('cal-chips');
+        const count = shadow.getElementById('cal-count');
+        if (!chips) return;
+        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        chips.innerHTML = '';
+        let available = 0;
+        for (let i = 0; i < 14; i++) {
+          const d = new Date(today); d.setDate(today.getDate() + i);
+          const iso = d.toISOString().slice(0,10);
+          const isBlocked = blocked.has(iso);
+          const chip = document.createElement('span');
+          chip.className = 'day-chip' + (isBlocked ? '' : ' avail') + (i===0 ? ' today' : '');
+          chip.textContent = days[d.getDay()] + ' ' + d.getDate();
+          chip.title = iso;
+          chip.addEventListener('click', () => {
+            if (blocked.has(iso)) blocked.delete(iso); else blocked.add(iso);
+            saveBlockedDays(blocked);
+            renderCalendar();
+          });
+          chips.appendChild(chip);
+          if (!isBlocked) available++;
+        }
+        if (count) count.textContent = available + '/14 available';
+      }
+
       render();
+      renderCalendar();
 
       loadShowImages(shows, (show) => {
         const wrap = shadow.querySelector(`.pw[data-show="${CSS.escape(show.name)}"]`);
@@ -663,10 +712,28 @@
       return false;
     }
 
+    function pageHasAvailableDate() {
+      const blocked = loadBlockedDays();
+      if (!blocked.size) return true;
+      const text = document.body.textContent || '';
+      const dateMatches = [...text.matchAll(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+(?:,\s+\d{4})?/g)];
+      if (!dateMatches.length) return true;
+      return dateMatches.some(m => { const iso = dateToISO(m[0]); return iso && !blocked.has(iso); });
+    }
+
     function fillForm() {
       if (filled) return;
       const firstNameField = document.getElementById('dlslot_name_first');
       if (!firstNameField) return;
+      if (!pageHasAvailableDate()) {
+        const ind = document.createElement('div');
+        ind.style.cssText = 'position:fixed;top:4px;right:4px;background:#111;color:#ecc94b;padding:8px 14px;border-radius:8px;font:13px sans-serif;z-index:99999;box-shadow:0 2px 12px rgba(0,0,0,.4)';
+        ind.textContent = '⚠️ Skipped — no available performances on your selected days';
+        document.body.appendChild(ind);
+        setTimeout(() => ind.remove(), 10000);
+        filled = true;
+        return;
+      }
       let count = 0;
       if (setVal(document.getElementById('dlslot_name_first'), ud.firstName)) count++;
       if (setVal(document.getElementById('dlslot_name_last'), ud.lastName)) count++;
@@ -732,12 +799,29 @@
       const available = allCbs.filter(cb => !cb.disabled);
       const alreadyEntered = allCbs.filter(cb => cb.disabled);
 
+      const blockedDays = loadBlockedDays();
+      function cbDateAvailable(row) {
+        if (!blockedDays.size) return true;
+        const rowText = row?.textContent || '';
+        const dateMatch = rowText.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
+        if (!dateMatch) return true;
+        const iso = dateToISO(dateMatch[0]);
+        return iso ? !blockedDays.has(iso) : true;
+      }
+      function getRow(cb) {
+        return cb.closest('[class*="row"],[class*="item"],[class*="performance"],li') || cb.parentElement?.parentElement?.parentElement;
+      }
+
       if (lsFilter === 'all') {
         if (!available.length) return { selected: 0, status: 'all_entered' };
-        const sa = document.querySelector('input.form-select-all, input[value="Select All"]');
-        if (sa && sa.offsetParent !== null) { sa.click(); return { selected: available.length, status: 'ok' }; }
-        available.forEach(cb => { if (!cb.checked) cb.click(); });
-        return { selected: available.length, status: 'ok' };
+        if (!blockedDays.size) {
+          const sa = document.querySelector('input.form-select-all, input[value="Select All"]');
+          if (sa && sa.offsetParent !== null) { sa.click(); return { selected: available.length, status: 'ok' }; }
+        }
+        const dateAvail = available.filter(cb => cbDateAvailable(getRow(cb)));
+        if (!dateAvail.length) return { selected: 0, status: 'no_match' };
+        dateAvail.forEach(cb => { if (!cb.checked) cb.click(); });
+        return { selected: dateAvail.length, status: 'ok' };
       }
 
       // Filtered mode — check what's available vs what matches filter
@@ -747,7 +831,7 @@
 
       allCbs.forEach(cb => {
         const con = cb.closest('div, label') || cb.parentElement;
-        const row = cb.closest('[class*="row"],[class*="item"],[class*="performance"],li') || cb.parentElement?.parentElement?.parentElement;
+        const row = getRow(cb);
         const morning = isMorning(con?.textContent?.trim()||'');
         const weekend = isWeekend(row) || isWeekend(con);
         const matches = weekend || (lsFilter==='morning'&&morning) || (lsFilter==='night'&&!morning);
@@ -755,6 +839,8 @@
         if (matches) {
           if (cb.disabled) {
             matchesAlreadyEntered++; // already entered for this slot
+          } else if (!cbDateAvailable(row)) {
+            // date blocked by user — skip silently
           } else {
             matchesFilter++;
             if (!cb.checked) { cb.click(); sel++; }
@@ -908,11 +994,22 @@
       let entered = 0;
       let alreadyIn = 0;
 
+      const tcBlocked = loadBlockedDays();
+      function cardHasAvailableDate(card) {
+        if (!tcBlocked.size) return true;
+        const text = card.textContent || '';
+        const dateMatches = [...text.matchAll(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+(?:,\s+\d{4})?/g)];
+        if (!dateMatches.length) return true;
+        return dateMatches.some(m => { const iso = dateToISO(m[0]); return iso && !tcBlocked.has(iso); });
+      }
+
       targetCards.forEach((card, i) => {
         const enteredDiv = card.querySelector('.lottery_show_enter_bottom .entered-text');
         const isAlreadyEntered = enteredDiv && enteredDiv.offsetParent !== null && /lottery entered/i.test(enteredDiv.textContent);
 
         if (isAlreadyEntered) { alreadyIn++; return; }
+
+        if (!cardHasAvailableDate(card)) { return; }
 
         // Set tickets
         const sel = card.querySelector('select[id^="tickets_"]');
