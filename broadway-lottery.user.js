@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      13.7
+// @version      13.8
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -455,7 +455,8 @@
             // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
             if (platform === 'Lucky Seat') {
               try {
-                const cached = JSON.parse(GM_getValue('ls_dates_' + normalizeShowName(show.name), '{}'));
+                const slug = link.url.split('/').filter(Boolean).pop() || '';
+                const cached = JSON.parse(GM_getValue('ls_dates_' + slug, '{}'));
                 if (cached.dates && cached.savedAt && (Date.now() - cached.savedAt) < 86400000) {
                   show.dates = cached.dates;
                   rerenderCard(show);
@@ -1019,9 +1020,9 @@
             return { ...base, time };
           });
         }).flat().filter(d => d.day);
-        if (dateEls.length && targetShow) {
-          const key = 'ls_dates_' + targetShow.replace(/[^a-z0-9]/g, '_');
-          GM_setValue(key, JSON.stringify({ dates: dateEls, savedAt: Date.now() }));
+        const slug = location.pathname.split('/').filter(Boolean).pop() || '';
+        if (dateEls.length && slug) {
+          GM_setValue('ls_dates_' + slug, JSON.stringify({ dates: dateEls, savedAt: Date.now() }));
         }
       } catch {}
 
