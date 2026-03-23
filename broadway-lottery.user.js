@@ -1087,5 +1087,6 @@
   else if (h.includes('broadwaydirect.com'))                                   runBroadwayDirect();
   else if (h.includes('luckyseat.com') && p.includes('/shows/'))              runLuckySeat();
   else if (h.includes('socialtoaster.com'))                                    runTelecharge();
+  else if (h.includes('google.com') && p.includes('/recaptcha/'))             runRecaptchaAutoClick();
 
 })();
