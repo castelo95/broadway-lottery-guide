@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.1
+// @version      14.2
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -435,15 +435,20 @@
           onerror() { resolve(''); }
         });
       }).then(html => {
-        if (!html || html.length < 1000) return;
+        console.log('[AP] Telecharge fetch: length=', html?.length, 'preview=', html?.slice(0,200));
+        if (!html || html.length < 1000) { console.log('[AP] Telecharge: too short, skipping'); return; }
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        const allCards = doc.querySelectorAll('div.lottery_show');
+        console.log('[AP] Telecharge: found', allCards.length, 'div.lottery_show cards');
         tcShows.forEach(show => {
-          const card = [...doc.querySelectorAll('div.lottery_show')].find(c =>
+          const card = [...allCards].find(c =>
             (c.querySelector('.lottery_show_title')?.textContent || '').toLowerCase().includes(show.name.toLowerCase().slice(0, 10))
           );
+          console.log('[AP] Telecharge show:', show.name, '→ card found?', !!card, card ? card.textContent.slice(0,150) : '');
           if (!card) return;
           const dates = parseTelechargeDate(card.outerHTML);
+          console.log('[AP] Telecharge dates for', show.name, ':', dates);
           if (dates.length) { show.dates = dates; rerenderCard(show); }
         });
       });
@@ -469,6 +474,7 @@
         const results = await Promise.all(batch.map(item => gmFetch(item.url)));
         results.forEach((html, j) => {
           const { show, url: itemUrl, platform } = batch[j];
+          console.log('[AP]', platform, show.name, 'fetch length=', html?.length, 'url=', itemUrl);
           if (!html || html.length < 5000) {
             // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
             if (platform === 'Lucky Seat') {
