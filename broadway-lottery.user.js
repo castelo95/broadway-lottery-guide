@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.8
+// @version      14.9
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -404,6 +404,7 @@
         .card:hover{border-color:#3a3020;background:#161209}
         .card.sel{border-color:#c9973a;background:#1a1408}
         .card.off{opacity:.3;pointer-events:none}
+        .card.off .dm{pointer-events:auto}
 
         .pw{width:90px;height:130px;flex-shrink:0;position:relative;overflow:hidden;background:#1a1610}
         .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(160deg,#1e1a10,#0d0b09)}
