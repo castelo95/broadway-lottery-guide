@@ -291,6 +291,18 @@
                 } catch {}
               }
             });
+            GM_xmlhttpRequest({
+              method: 'GET',
+              url: `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=extracts&exintro=true&explaintext=true&format=json&origin=*`,
+              onload(res3) {
+                try {
+                  const page = Object.values(JSON.parse(res3.responseText).query?.pages || {})[0];
+                  const extract = page?.extract || '';
+                  const perfMatch = extract.match(/([\d,]+)\s+performances/i);
+                  if (perfMatch) { show.perf = perfMatch[1]; rerenderCard(show); }
+                } catch {}
+              }
+            });
           } catch {}
         }
       });
@@ -390,6 +402,8 @@
         .sn{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:#d4c4a0;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-shadow:none}
         .card.sel .sn{color:#fff}
         .card:hover .sn{color:#f0e6d0}
+        .perf{font-size:9px;color:#6a5a3a;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .card.sel .perf{color:#a08840;}
         .meta{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;gap:4px;align-items:center}
         .pbd{color:#6a8aaa}.pls{color:#5a8a6a}.ptc{color:#8a6aaa}
         .dot{width:2px;height:2px;border-radius:50%;background:#3a3020;display:inline-block;flex-shrink:0}
@@ -514,6 +528,7 @@
                   <div class="acc"></div>
                   <div class="info">
                     <div class="sn">${s.name}</div>
+                    ${s.perf ? `<div class="perf">${s.perf} performances</div>` : ''}
                     <div class="meta">${plats.map(p=>`<span class="${p==='Broadway Direct'?'pbd':p==='Lucky Seat'?'pls':'ptc'}">${p}</span>`).join('')}${prices.length?`<span class="dot"></span><span class="pr">${prices.join('/')}</span>`:''}</div>
                   </div>
                   <div class="side">
