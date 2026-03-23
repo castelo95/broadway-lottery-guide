@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.0
+// @version      14.1
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -287,29 +287,57 @@
   }
 
   function parseDayAbbr(dateStr) {
-    // dateStr: "Tuesday, March 24, 2026" → { day: "Tue", date: 24 }
+    // dateStr: "Tuesday, March 24, 2026" or "Tuesday, March 24" → { day: "Tue", date: 24 }
     const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     try {
-      const d = new Date(dateStr);
-      return { day: days[d.getDay()], date: d.getDate() };
+      // Strip day-of-week and any year, then add current year for reliable parsing
+      const clean = dateStr.replace(/^[A-Z][a-z]+day,?\s+/, '').replace(/,?\s*\d{4}\s*$/, '').trim();
+      const d = new Date(clean + ', ' + new Date().getFullYear());
+      if (!isNaN(d.getTime())) return { day: days[d.getDay()], date: d.getDate() };
+      return null;
     } catch { return null; }
   }
 
-  function parseTelechargeDate(html) {
-    // Returns array of {day, date, time} from Telecharge show card HTML
+  function extractDatesFromText(text) {
+    // Scan plain text for date+time pairs regardless of HTML structure.
+    // Returns [{day, date, time}] deduped.
     const dates = [];
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    doc.querySelectorAll('.lottery_show_date, [class*="date"], [class*="time"]').forEach(el => {
-      const text = el.textContent.trim();
-      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+/);
-      const timeMatch = text.match(/\d+:\d+\s*[AP]M/i);
-      if (dateMatch && timeMatch) {
-        const parsed = parseDayAbbr(dateMatch[0]);
-        if (parsed) dates.push({ ...parsed, time: formatTime(timeMatch[0]) });
+    const seen = new Set();
+    const t = text.replace(/\s+/g, ' ');
+    const dateRe = /([A-Z][a-z]+day),?\s+([A-Z][a-z]+\s+\d{1,2}(?:,?\s+\d{4})?)/g;
+    const timeRe = /(\d{1,2}:\d{2}\s*[AP]M)/gi;
+    const dateMatches = [], timeMatches = [];
+    let m;
+    while ((m = dateRe.exec(t)) !== null) {
+      dateMatches.push({ pos: m.index, end: m.index + m[0].length, str: m[1] + ', ' + m[2] });
+    }
+    while ((m = timeRe.exec(t)) !== null) {
+      timeMatches.push({ pos: m.index, str: m[1] });
+    }
+    dateMatches.forEach((dateM, idx) => {
+      const parsed = parseDayAbbr(dateM.str);
+      if (!parsed) return;
+      const nextDatePos = idx < dateMatches.length - 1 ? dateMatches[idx + 1].pos : t.length;
+      const nearTimes = timeMatches.filter(tm => tm.pos > dateM.end && tm.pos < nextDatePos);
+      if (nearTimes.length === 0) {
+        const key = `${parsed.day}${parsed.date}`;
+        if (!seen.has(key)) { seen.add(key); dates.push({ ...parsed, time: '' }); }
+      } else {
+        nearTimes.forEach(tm => {
+          const time = formatTime(tm.str);
+          const key = `${parsed.day}${parsed.date}${time}`;
+          if (!seen.has(key)) { seen.add(key); dates.push({ ...parsed, time }); }
+        });
       }
     });
     return dates;
+  }
+
+  function parseTelechargeDate(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,style').forEach(el => el.remove());
+    return extractDatesFromText(doc.body?.textContent || '');
   }
 
   function parseLuckySeatDates(html) {
@@ -338,20 +366,10 @@
   }
 
   function parseBroadwayDirectDates(html) {
-    // Returns array of {day, date, time} from Broadway Direct lottery page HTML
-    const dates = [];
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    doc.querySelectorAll('[class*="date"],[class*="perf"],[class*="show-time"]').forEach(el => {
-      const text = el.textContent.trim();
-      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+/);
-      const timeMatch = text.match(/\d+:\d+\s*[AP]M/i);
-      if (dateMatch) {
-        const parsed = parseDayAbbr(dateMatch[0]);
-        if (parsed) dates.push({ ...parsed, time: timeMatch ? formatTime(timeMatch[0]) : '' });
-      }
-    });
-    return dates;
+    doc.querySelectorAll('script,style').forEach(el => el.remove());
+    return extractDatesFromText(doc.body?.textContent || '');
   }
 
   function loadShowImages(shows, rerenderCard) {
