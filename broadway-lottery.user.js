@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.11
+// @version      14.12
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -928,7 +928,22 @@
             showIndicator('✓ All done — submitting automatically...', '#48bb78');
             setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 600);
           } else {
-            showIndicator('✓ Performances selected & tickets set — click "I\'m not a robot" then <b style="color:#fff">Submit Entry</b>', '#ecc94b');
+            showIndicator('✓ Captcha clicked — waiting for verification...', '#ecc94b');
+            const pollStart = Date.now();
+            const pollId = setInterval(() => {
+              if (!hasPendingCaptcha()) {
+                clearInterval(pollId);
+                if (!isManual) {
+                  showIndicator('✓ Captcha solved — submitting...', '#48bb78');
+                  setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 400);
+                } else {
+                  showIndicator('✓ Captcha solved — click <b style="color:#fff">Submit Entry</b> when ready', '#6a8aaa');
+                }
+              } else if (Date.now() - pollStart > 20000) {
+                clearInterval(pollId);
+                showIndicator('✓ Performances selected & tickets set — click "I\'m not a robot" then <b style="color:#fff">Submit Entry</b>', '#ecc94b');
+              }
+            }, 500);
           }
         }, delay);
       }, 500);
