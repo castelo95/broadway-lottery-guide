@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      13.8
+// @version      13.9
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -1004,22 +1004,29 @@
 
       // Save performance dates to cache for panel use
       try {
-        const dateEls = [...document.querySelectorAll('input[type="checkbox"]')].map(cb => {
-          const row = cb.closest('li, tr, div') || cb.parentElement;
-          const text = row?.textContent || '';
-          const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
-          const timeMatches = [...text.matchAll(/\d+:\d+\s*[AP]M/gi)];
-          if (!dateMatch) return [];
-          const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-          const d = new Date(dateMatch[0]);
-          const base = { day: days[d.getDay()], date: d.getDate() };
-          if (!timeMatches.length) return [{ ...base, time: '' }];
-          return timeMatches.map(tm => {
-            const m = tm[0].match(/(\d+):(\d+)\s*(AM|PM)/i);
+        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const dateEls = [...document.querySelectorAll('input[type="checkbox"]')]
+          .filter(cb => cb.offsetParent !== null)
+          .map(cb => {
+            // Use same row selector as selectPerformances() — goes up to the date-level row
+            const row = cb.closest('[class*="row"],[class*="item"],[class*="performance"],li,tr')
+                        || cb.parentElement?.parentElement?.parentElement;
+            // Time is in the immediate label/div container
+            const con = cb.closest('div,label') || cb.parentElement;
+            const rowText = row?.textContent || '';
+            const timeText = con?.textContent?.trim() || rowText;
+            const dateMatch = rowText.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
+            const timeMatch = timeText.match(/\d+:\d+\s*[AP]M/i);
+            if (!dateMatch) return null;
+            const d = new Date(dateMatch[0]);
+            const base = { day: days[d.getDay()], date: d.getDate() };
+            const m = timeMatch?.[0].match(/(\d+):(\d+)\s*(AM|PM)/i);
             const time = m ? (m[2] === '00' ? m[1] + m[3].toLowerCase() : m[1] + ':' + m[2] + m[3].toLowerCase()) : '';
             return { ...base, time };
-          });
-        }).flat().filter(d => d.day);
+          })
+          .filter(Boolean)
+          // Deduplicate same day+time
+          .filter((d, i, arr) => arr.findIndex(x => x.day === d.day && x.date === d.date && x.time === d.time) === i);
         const slug = location.pathname.split('/').filter(Boolean).pop() || '';
         if (dateEls.length && slug) {
           GM_setValue('ls_dates_' + slug, JSON.stringify({ dates: dateEls, savedAt: Date.now() }));
