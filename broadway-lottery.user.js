@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      13.9
+// @version      14.0
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -450,12 +450,12 @@
         const batch = toFetch.slice(i, i + 5);
         const results = await Promise.all(batch.map(item => gmFetch(item.url)));
         results.forEach((html, j) => {
-          const { show, platform } = batch[j];
+          const { show, url: itemUrl, platform } = batch[j];
           if (!html || html.length < 5000) {
             // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
             if (platform === 'Lucky Seat') {
               try {
-                const slug = link.url.split('/').filter(Boolean).pop() || '';
+                const slug = itemUrl.split('/').filter(Boolean).pop() || '';
                 const cached = JSON.parse(GM_getValue('ls_dates_' + slug, '{}'));
                 if (cached.dates && cached.savedAt && (Date.now() - cached.savedAt) < 86400000) {
                   show.dates = cached.dates;
