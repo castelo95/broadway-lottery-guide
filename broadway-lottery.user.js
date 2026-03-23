@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.4
+// @version      14.5
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -15,10 +15,7 @@
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @connect      en.wikipedia.org
-// @connect      lottery.broadwaydirect.com
-// @connect      my.socialtoaster.com
 // @connect      www.luckyseat.com
-// @connect      luckyseat.com
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -275,103 +272,6 @@
     return shows;
   }
 
-  function normalizeShowName(name) {
-    return name.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
-  }
-
-  function formatTime(raw) {
-    // raw: "7:00 PM" or "8:30 PM" → "7pm" or "8:30pm"
-    const m = raw.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
-    if (!m) return raw.trim().toLowerCase();
-    const h = m[1], min = m[2], ampm = m[3].toLowerCase();
-    return min === '00' ? `${h}${ampm}` : `${h}:${min}${ampm}`;
-  }
-
-  function parseDayAbbr(dateStr) {
-    // dateStr: "Tuesday, March 24, 2026" or "Tuesday, March 24" → { day: "Tue", date: 24 }
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    try {
-      // Strip day-of-week and any year, then add current year for reliable parsing
-      const clean = dateStr.replace(/^[A-Z][a-z]+day,?\s+/, '').replace(/,?\s*\d{4}\s*$/, '').trim();
-      const d = new Date(clean + ', ' + new Date().getFullYear());
-      if (!isNaN(d.getTime())) return { day: days[d.getDay()], date: d.getDate() };
-      return null;
-    } catch { return null; }
-  }
-
-  function extractDatesFromText(text) {
-    // Scan plain text for date+time pairs regardless of HTML structure.
-    // Returns [{day, date, time}] deduped.
-    const dates = [];
-    const seen = new Set();
-    const t = text.replace(/\s+/g, ' ');
-    const dateRe = /([A-Z][a-z]+day),?\s+([A-Z][a-z]+\s+\d{1,2}(?:,?\s+\d{4})?)/g;
-    const timeRe = /(\d{1,2}:\d{2}\s*[AP]M)/gi;
-    const dateMatches = [], timeMatches = [];
-    let m;
-    while ((m = dateRe.exec(t)) !== null) {
-      dateMatches.push({ pos: m.index, end: m.index + m[0].length, str: m[1] + ', ' + m[2] });
-    }
-    while ((m = timeRe.exec(t)) !== null) {
-      timeMatches.push({ pos: m.index, str: m[1] });
-    }
-    dateMatches.forEach((dateM, idx) => {
-      const parsed = parseDayAbbr(dateM.str);
-      if (!parsed) return;
-      const nextDatePos = idx < dateMatches.length - 1 ? dateMatches[idx + 1].pos : t.length;
-      const nearTimes = timeMatches.filter(tm => tm.pos > dateM.end && tm.pos < nextDatePos);
-      if (nearTimes.length === 0) {
-        const key = `${parsed.day}${parsed.date}`;
-        if (!seen.has(key)) { seen.add(key); dates.push({ ...parsed, time: '' }); }
-      } else {
-        nearTimes.forEach(tm => {
-          const time = formatTime(tm.str);
-          const key = `${parsed.day}${parsed.date}${time}`;
-          if (!seen.has(key)) { seen.add(key); dates.push({ ...parsed, time }); }
-        });
-      }
-    });
-    return dates;
-  }
-
-  function parseTelechargeDate(html) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    doc.querySelectorAll('script,style').forEach(el => el.remove());
-    return extractDatesFromText(doc.body?.textContent || '');
-  }
-
-  function parseLuckySeatDates(html) {
-    // Returns array of {day, date, time} from Lucky Seat show page HTML
-    const dates = [];
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    // Lucky Seat shows dates in rows: "Tuesday, March 24, 2026" with time buttons "7:00 PM"
-    doc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      const row = cb.closest('li, tr, div') || cb.parentElement;
-      if (!row) return;
-      const text = row.textContent || '';
-      const dateMatch = text.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
-      const timeMatches = [...text.matchAll(/\d+:\d+\s*[AP]M/gi)];
-      if (dateMatch) {
-        const parsed = parseDayAbbr(dateMatch[0]);
-        if (!parsed) return;
-        if (timeMatches.length === 0) {
-          dates.push({ ...parsed, time: '' });
-        } else {
-          timeMatches.forEach(tm => dates.push({ ...parsed, time: formatTime(tm[0]) }));
-        }
-      }
-    });
-    return dates;
-  }
-
-  function parseBroadwayDirectDates(html) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    doc.querySelectorAll('script,style').forEach(el => el.remove());
-    return extractDatesFromText(doc.body?.textContent || '');
-  }
 
   function loadShowImages(shows, rerenderCard) {
     shows.forEach(show => {
@@ -411,101 +311,6 @@
     });
   }
 
-  function loadShowDates(shows, rerenderCard) {
-    // Build list of {show, url, platform} to fetch — one entry per lottery URL
-    const toFetch = [];
-    const tcShows = []; // Telecharge: all on one page
-    shows.forEach(show => {
-      show.links.forEach(link => {
-        if (link.platform === 'Telecharge') {
-          if (!tcShows.includes(show)) tcShows.push(show);
-        } else {
-          toFetch.push({ show, url: link.url, platform: link.platform });
-        }
-      });
-    });
-
-    // Telecharge: 1 request for all shows
-    if (tcShows.length) {
-      new Promise(resolve => {
-        GM_xmlhttpRequest({
-          method: 'GET', anonymous: false,
-          url: 'https://my.socialtoaster.com/lottery_select/?key=BROADWAY',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Referer': 'https://my.socialtoaster.com/',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5'
-          },
-          onload(res) { resolve(res.responseText); },
-          onerror() { resolve(''); }
-        });
-      }).then(html => {
-        console.log('[AP] Telecharge fetch: length=', html?.length, 'preview=', html?.slice(0,300));
-        if (!html || html.length < 1000 || html.includes('<title>SocialToaster | Error')) { console.log('[AP] Telecharge: error page or too short, skipping'); return; }
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const allCards = doc.querySelectorAll('div.lottery_show');
-        console.log('[AP] Telecharge: found', allCards.length, 'div.lottery_show cards');
-        tcShows.forEach(show => {
-          const card = [...allCards].find(c =>
-            (c.querySelector('.lottery_show_title')?.textContent || '').toLowerCase().includes(show.name.toLowerCase().slice(0, 10))
-          );
-          console.log('[AP] Telecharge show:', show.name, '→ card found?', !!card, card ? card.textContent.slice(0,150) : '');
-          if (!card) return;
-          const dates = parseTelechargeDate(card.outerHTML);
-          console.log('[AP] Telecharge dates for', show.name, ':', dates);
-          if (dates.length) { show.dates = dates; rerenderCard(show); }
-        });
-      });
-    }
-
-    // Broadway Direct + Lucky Seat: batches of 5 parallel
-    function gmFetch(url) {
-      return new Promise(resolve => {
-        GM_xmlhttpRequest({
-          method: 'GET', anonymous: false,
-          url,
-          headers: { 'User-Agent': 'Mozilla/5.0' },
-          onload(res) { resolve(res.responseText || ''); },
-          onerror() { resolve(''); },
-          ontimeout() { resolve(''); }
-        });
-      });
-    }
-
-    async function processBatches() {
-      for (let i = 0; i < toFetch.length; i += 5) {
-        const batch = toFetch.slice(i, i + 5);
-        const results = await Promise.all(batch.map(item => gmFetch(item.url)));
-        results.forEach((html, j) => {
-          const { show, url: itemUrl, platform } = batch[j];
-          console.log('[AP]', platform, show.name, 'fetch length=', html?.length, 'url=', itemUrl);
-          const minLength = platform === 'Lucky Seat' ? 5000 : 500;
-          if (!html || html.length < minLength) {
-            // Lucky Seat: try cache (Angular shell is typically < 5000 chars)
-            if (platform === 'Lucky Seat') {
-              try {
-                const slug = itemUrl.split('/').filter(Boolean).pop() || '';
-                const cached = JSON.parse(GM_getValue('ls_dates_' + slug, '{}'));
-                if (cached.dates && cached.savedAt && (Date.now() - cached.savedAt) < 86400000) {
-                  show.dates = cached.dates;
-                  rerenderCard(show);
-                }
-              } catch {}
-            }
-            return;
-          }
-          let dates = [];
-          if (platform === 'Broadway Direct') dates = parseBroadwayDirectDates(html);
-          if (platform === 'Lucky Seat')      dates = parseLuckySeatDates(html);
-          if (dates.length) { show.dates = dates; rerenderCard(show); }
-        });
-      }
-    }
-
-    processBatches();
-  }
 
   function runBwayRush() {
     GM_addStyle(`
@@ -602,9 +407,7 @@
         .card:hover .sn{color:#f0e6d0}
         .perf{font-size:9px;color:#6a5a3a;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .card.sel .perf{color:#a08840;}
-        .dates-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;}
-        .chip{font-size:10px;color:#8a7a60;background:#1a1610;border:1px solid rgba(201,151,58,.3);border-radius:3px;padding:1px 5px;white-space:nowrap;}
-        .meta{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;gap:4px;align-items:center}
+.meta{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;gap:4px;align-items:center}
         .pbd{color:#6a8aaa}.pls{color:#5a8a6a}.ptc{color:#8a6aaa}
         .dot{width:2px;height:2px;border-radius:50%;background:#3a3020;display:inline-block;flex-shrink:0}
         .pr{color:#c9973a;font-weight:700}
@@ -729,8 +532,7 @@
                   <div class="info">
                     <div class="sn">${s.name}</div>
                     ${s.perf ? `<div class="perf">${s.perf} performances</div>` : ''}
-                    ${s.dates && s.dates.length ? `<div class="dates-row">${s.dates.map(d=>`<span class="chip">${d.day} ${d.date}${d.time?' · '+d.time:''}</span>`).join('')}</div>` : ''}
-                    <div class="meta">${plats.map(p=>`<span class="${p==='Broadway Direct'?'pbd':p==='Lucky Seat'?'pls':'ptc'}">${p}</span>`).join('')}${prices.length?`<span class="dot"></span><span class="pr">${prices.join('/')}</span>`:''}</div>
+<div class="meta">${plats.map(p=>`<span class="${p==='Broadway Direct'?'pbd':p==='Lucky Seat'?'pls':'ptc'}">${p}</span>`).join('')}${prices.length?`<span class="dot"></span><span class="pr">${prices.join('/')}</span>`:''}</div>
                   </div>
                   <div class="side">
                     <div class="chk"></div>
@@ -837,33 +639,6 @@
             perfEl.textContent = `${show.perf} performances`;
             info.querySelector('.sn').after(perfEl);
           }
-        }
-        if (show.dates && show.dates.length) {
-          const card = wrap.closest('.card');
-          if (!card) return;
-          const info = card.querySelector('.info');
-          if (!info) return;
-          let row = info.querySelector('.dates-row');
-          if (!row) { row = document.createElement('div'); row.className = 'dates-row'; info.appendChild(row); }
-          row.innerHTML = show.dates.map(d =>
-            `<span class="chip">${d.day} ${d.date}${d.time ? ' · ' + d.time : ''}</span>`
-          ).join('');
-        }
-      });
-
-      loadShowDates(shows, (show) => {
-        const wrap = shadow.querySelector(`.pw[data-show="${CSS.escape(show.name)}"]`);
-        if (!wrap) return;
-        if (show.dates && show.dates.length) {
-          const card = wrap.closest('.card');
-          if (!card) return;
-          const info = card.querySelector('.info');
-          if (!info) return;
-          let row = info.querySelector('.dates-row');
-          if (!row) { row = document.createElement('div'); row.className = 'dates-row'; info.appendChild(row); }
-          row.innerHTML = show.dates.map(d =>
-            `<span class="chip">${d.day} ${d.date}${d.time ? ' · ' + d.time : ''}</span>`
-          ).join('');
         }
       });
     }
@@ -1032,37 +807,6 @@
       if (!document.querySelectorAll('input[type="checkbox"]').length) return;
       if (!document.querySelector('button.c-btn--large, button[type="submit"]')) return;
       done = true;
-
-      // Save performance dates to cache for panel use
-      try {
-        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        const dateEls = [...document.querySelectorAll('input[type="checkbox"]')]
-          .filter(cb => cb.offsetParent !== null)
-          .map(cb => {
-            // Use same row selector as selectPerformances() — goes up to the date-level row
-            const row = cb.closest('[class*="row"],[class*="item"],[class*="performance"],li,tr')
-                        || cb.parentElement?.parentElement?.parentElement;
-            // Time is in the immediate label/div container
-            const con = cb.closest('div,label') || cb.parentElement;
-            const rowText = row?.textContent || '';
-            const timeText = con?.textContent?.trim() || rowText;
-            const dateMatch = rowText.match(/[A-Z][a-z]+day,\s+[A-Z][a-z]+\s+\d+,\s+\d{4}/);
-            const timeMatch = timeText.match(/\d+:\d+\s*[AP]M/i);
-            if (!dateMatch) return null;
-            const d = new Date(dateMatch[0]);
-            const base = { day: days[d.getDay()], date: d.getDate() };
-            const m = timeMatch?.[0].match(/(\d+):(\d+)\s*(AM|PM)/i);
-            const time = m ? (m[2] === '00' ? m[1] + m[3].toLowerCase() : m[1] + ':' + m[2] + m[3].toLowerCase()) : '';
-            return { ...base, time };
-          })
-          .filter(Boolean)
-          // Deduplicate same day+time
-          .filter((d, i, arr) => arr.findIndex(x => x.day === d.day && x.date === d.date && x.time === d.time) === i);
-        const slug = location.pathname.split('/').filter(Boolean).pop() || '';
-        if (dateEls.length && slug) {
-          GM_setValue('ls_dates_' + slug, JSON.stringify({ dates: dateEls, savedAt: Date.now() }));
-        }
-      } catch {}
 
       const result = selectPerformances();
 
