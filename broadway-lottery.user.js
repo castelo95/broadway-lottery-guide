@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.10
+// @version      14.11
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -1053,14 +1053,13 @@
 
   function runRecaptchaAutoClick() {
     // Decode the co= parameter to verify parent page is one of our target sites
-    const co = new URLSearchParams(location.search).get('co') || '';
+    const co = (new URLSearchParams(location.search).get('co') || '').replace(/\.+$/, '');
     let origin = '';
     try {
       const padded = co.replace(/-/g, '+').replace(/_/g, '/');
       const withPadding = padded + '='.repeat((4 - padded.length % 4) % 4);
       origin = atob(withPadding);
     } catch(e) {}
-    console.log('[BWAY] recaptcha iframe — origin decoded:', origin); // DEBUG — remove after testing
     const targets = ['luckyseat.com', 'broadwaydirect.com'];
     if (!targets.some(t => origin.includes(t))) return;
 
