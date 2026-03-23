@@ -77,6 +77,7 @@
   function runBroadwayDirect() {
     const ud = loadUser();
     if (!ud.firstName || !ud.email) { showBanner('⚠️ Set up your data first at bwayrush.com', '#ecc94b'); return; }
+    const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let completedCount = 0, currentIndex = 0, isProcessing = false;
 
     function getEnterNowButtons() {
@@ -172,9 +173,12 @@
         if (count >= 3) {
           clearInterval(tryFill);
           setTimeout(() => {
-            if (!hasPendingCaptcha()) {
+            if (!hasPendingCaptcha() && !isManual) {
               showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} — no captcha, sending...</span>${remaining>1?`<div class="sub">${remaining-1} more to go</div>`:''}`, '#48bb78');
               setTimeout(() => { clickEnterButton(); completedCount++; currentIndex++; watchForSuccessOrClose(); }, 600);
+            } else if (isManual) {
+              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} filled</span><div class="sub">👆 Click ENTER when ready${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#6a8aaa');
+              completedCount++; currentIndex++; watchForSuccessOrClose();
             } else {
               showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} filled</span><div class="sub">👆 Solve reCAPTCHA → click ENTER${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#48bb78');
               completedCount++; currentIndex++; watchForSuccessOrClose();
@@ -303,7 +307,7 @@
     function build() {
       const shows = scrapeShows();
       const selected = new Set();
-      let globalAuto = false; // global auto-submit toggle
+      let globalAuto = GM_getValue('ap_auto_mode', '0') === '1'; // global auto-submit toggle, persisted
       let filter = 'all';
 
       const fab = document.createElement('button');
