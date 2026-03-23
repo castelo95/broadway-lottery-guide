@@ -1050,6 +1050,34 @@
     [800, 1500, 2500, 4000].forEach(t => setTimeout(() => { if (!done) tryFill(); }, t));
   }
 
+  function runRecaptchaAutoClick() {
+    // Decode the co= parameter to verify parent page is one of our target sites
+    const co = new URLSearchParams(location.search).get('co') || '';
+    let origin = '';
+    try {
+      const padded = co.replace(/-/g, '+').replace(/_/g, '/');
+      const withPadding = padded + '='.repeat((4 - padded.length % 4) % 4);
+      origin = atob(withPadding);
+    } catch(e) {}
+    const targets = ['luckyseat.com', 'broadwaydirect.com'];
+    if (!targets.some(t => origin.includes(t))) return;
+
+    // obs is declared after tryClick but always assigned before any setTimeout fires (300ms+).
+    // tryClick is only ever called asynchronously, so obs is safe to reference here.
+    function tryClick() {
+      const cb = document.querySelector('#recaptcha-anchor');
+      if (!cb || cb.getAttribute('aria-checked') === 'true') return;
+      cb.click();
+      obs.disconnect(); // safe: obs is assigned before any timer can fire
+    }
+
+    // @run-at is document-idle globally — that's fine here. The iframe needs ~300ms to render
+    // its checkbox regardless, so the setTimeout floor of 300ms covers the timing gap.
+    const obs = new MutationObserver(tryClick);
+    obs.observe(document.body, { childList: true, subtree: true });
+    [300, 600, 1000, 1500, 2000].forEach(t => setTimeout(tryClick, t));
+  }
+
   // ═══ ROUTER ══════════════════════════════════════════════════════════
 
   const h = location.hostname;
