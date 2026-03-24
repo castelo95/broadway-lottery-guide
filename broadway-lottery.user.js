@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.13
+// @version      14.14
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -954,7 +954,7 @@
                 btn.click();
                 // Watch for "Review Your Selection" confirmation modal and auto-confirm
                 const confirmObs = new MutationObserver(() => {
-                  const confirmBtn = [...document.querySelectorAll('button')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
+                  const confirmBtn = [...document.querySelectorAll('button, a')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
                   if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
                 });
                 confirmObs.observe(document.body, { childList: true, subtree: true });
@@ -974,7 +974,7 @@
                     if (btn) {
                       btn.click();
                       const confirmObs = new MutationObserver(() => {
-                        const confirmBtn = [...document.querySelectorAll('button')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
+                        const confirmBtn = [...document.querySelectorAll('button, a')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
                         if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
                       });
                       confirmObs.observe(document.body, { childList: true, subtree: true });
