@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.12
+// @version      14.13
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -757,9 +757,31 @@
           const needsCaptcha = captchaFrame && captchaFrame.offsetParent !== null && !(captchaResp && captchaResp.value && captchaResp.value.length > 10);
           const ind = document.createElement('div');
           ind.style.cssText = 'position:fixed;top:4px;right:4px;background:#111;color:#48bb78;padding:8px 14px;border-radius:8px;font:13px sans-serif;z-index:99999;box-shadow:0 2px 12px rgba(0,0,0,.4)';
-          if (!needsCaptcha && !isManual) {
+          function bdSubmit() {
             const btn = [...document.querySelectorAll('input[type="submit"],button[type="submit"],button')].find(b => b.offsetParent !== null && /^(ENTER|SUBMIT)$/i.test((b.value||b.textContent).trim()));
-            if (btn) { ind.textContent = `🎭 ✓ ${count} fields — submitting...`; document.body.appendChild(ind); setTimeout(() => ind.remove(), 8000); setTimeout(() => btn.click(), 500); }
+            if (btn) { setTimeout(() => btn.click(), 500); }
+          }
+          if (!needsCaptcha && !isManual) {
+            ind.textContent = `🎭 ✓ ${count} fields — submitting...`;
+            document.body.appendChild(ind);
+            setTimeout(() => ind.remove(), 8000);
+            bdSubmit();
+          } else if (!isManual) {
+            ind.textContent = `🎭 ✓ ${count} fields — captcha clicked, waiting...`;
+            document.body.appendChild(ind);
+            const bdPollStart = Date.now();
+            const bdPollId = setInterval(() => {
+              const resp2 = document.querySelector('textarea[name="g-recaptcha-response"],#g-recaptcha-response');
+              if (resp2 && resp2.value && resp2.value.length > 10) {
+                clearInterval(bdPollId);
+                ind.textContent = `🎭 ✓ ${count} fields — captcha solved, submitting...`;
+                setTimeout(() => ind.remove(), 8000);
+                bdSubmit();
+              } else if (Date.now() - bdPollStart > 20000) {
+                clearInterval(bdPollId);
+                ind.textContent = `🎭 ✓ ${count} fields — click "I'm not a robot" then click ENTER`;
+              }
+            }, 500);
           } else {
             ind.textContent = `🎭 ✓ ${count} fields — click "I'm not a robot" then click ENTER`;
             document.body.appendChild(ind);
@@ -926,7 +948,19 @@
             showIndicator('✓ Performances selected & tickets set — click <b style="color:#fff">Submit Entry</b> when ready', '#6a8aaa');
           } else if (!hasPendingCaptcha()) {
             showIndicator('✓ All done — submitting automatically...', '#48bb78');
-            setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 600);
+            setTimeout(() => {
+              const btn = document.querySelector('button.c-btn--large, button[type="submit"]');
+              if (btn) {
+                btn.click();
+                // Watch for "Review Your Selection" confirmation modal and auto-confirm
+                const confirmObs = new MutationObserver(() => {
+                  const confirmBtn = [...document.querySelectorAll('button')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
+                  if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
+                });
+                confirmObs.observe(document.body, { childList: true, subtree: true });
+                setTimeout(() => confirmObs.disconnect(), 10000);
+              }
+            }, 600);
           } else {
             showIndicator('✓ Captcha clicked — waiting for verification...', '#ecc94b');
             const pollStart = Date.now();
@@ -935,7 +969,18 @@
                 clearInterval(pollId);
                 if (!isManual) {
                   showIndicator('✓ Captcha solved — submitting...', '#48bb78');
-                  setTimeout(() => { const btn = document.querySelector('button.c-btn--large, button[type="submit"]'); if (btn) btn.click(); }, 400);
+                  setTimeout(() => {
+                    const btn = document.querySelector('button.c-btn--large, button[type="submit"]');
+                    if (btn) {
+                      btn.click();
+                      const confirmObs = new MutationObserver(() => {
+                        const confirmBtn = [...document.querySelectorAll('button')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
+                        if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
+                      });
+                      confirmObs.observe(document.body, { childList: true, subtree: true });
+                      setTimeout(() => confirmObs.disconnect(), 10000);
+                    }
+                  }, 400);
                 } else {
                   showIndicator('✓ Captcha solved — click <b style="color:#fff">Submit Entry</b> when ready', '#6a8aaa');
                 }
