@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.14
+// @version      14.15
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -55,6 +55,9 @@
   function saveLsFilter(v) { GM_setValue('ls_filter', v); }
   function loadBlockedDays() { try { return new Set(JSON.parse(GM_getValue('ap_blocked_days','[]'))); } catch { return new Set(); } }
   function saveBlockedDays(s) { GM_setValue('ap_blocked_days', JSON.stringify([...s])); }
+  function loadRunLog() { try { return JSON.parse(GM_getValue('ap_run_log','null'))||null; } catch { return null; } }
+  function saveRunLog(log) { GM_setValue('ap_run_log', JSON.stringify(log)); }
+  function addRunLogEntry(entry) { const log=loadRunLog()||{runTime:new Date().toISOString(),entries:[]}; log.entries.push(entry); saveRunLog(log); }
   function dateToISO(dateStr) {
     const clean = dateStr.replace(/^[A-Z][a-z]+day,?\s+/,'').replace(/,?\s*\d{4}\s*$/,'').trim();
     const d = new Date(clean + ', ' + new Date().getFullYear());
