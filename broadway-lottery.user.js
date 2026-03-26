@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Broadway Lottery 🎭
 // @namespace    https://bwayrush.com/
-// @version      14.15
+// @version      14.16
 // @description  Broadway Lottery Autopilot — Broadway Direct, Lucky Seat, Telecharge (coming soon)
 // @author       Javier Castello
 // @updateURL    https://castelo95.github.io/broadway-lottery-guide/broadway-lottery.user.js
@@ -93,7 +93,7 @@
     const ud = loadUser();
     if (!ud.firstName || !ud.email) { showBanner('⚠️ Set up your data first at bwayrush.com', '#ecc94b'); return; }
     const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
-    let completedCount = 0, currentIndex = 0, isProcessing = false;
+    let completedCount = 0, isProcessing = false;
 
     function getEnterNowButtons() {
       return [...document.querySelectorAll('a.enter-button, button.enter-button, [class*="enter-now"], input[value*="ENTER NOW"]')].filter(btn => btn.offsetParent !== null);
@@ -173,14 +173,14 @@
     function processNext() {
       if (isProcessing) return;
       const buttons = getEnterNowButtons();
-      if (currentIndex >= buttons.length || buttons.length === 0) {
+      if (!buttons.length) {
         if (completedCount > 0) showBanner(`<span style="color:#48bb78">✓ ${completedCount} entr${completedCount>1?'ies':'y'} submitted.</span><div class="sub">Check your email for results.</div>`, '#48bb78');
         else showBanner(`No open "ENTER NOW" lotteries found.<div class="sub">All may be Closed/Upcoming or already entered.</div>`, '#ecc94b');
         return;
       }
       isProcessing = true;
-      buttons[currentIndex].click();
-      const remaining = buttons.length - currentIndex;
+      buttons[0].click();
+      const remaining = buttons.length;
       let attempts = 0;
       const tryFill = setInterval(() => {
         if (++attempts > 20) { clearInterval(tryFill); isProcessing = false; return; }
@@ -189,14 +189,14 @@
           clearInterval(tryFill);
           setTimeout(() => {
             if (!hasPendingCaptcha() && !isManual) {
-              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} — no captcha, sending...</span>${remaining>1?`<div class="sub">${remaining-1} more to go</div>`:''}`, '#48bb78');
-              setTimeout(() => { clickEnterButton(); completedCount++; currentIndex++; watchForSuccessOrClose(); }, 600);
+              showBanner(`<span style="color:#48bb78">✓ Form ${completedCount+1}/${completedCount+remaining} — no captcha, sending...</span>${remaining>1?`<div class="sub">${remaining-1} more to go</div>`:''}`, '#48bb78');
+              setTimeout(() => { clickEnterButton(); completedCount++; watchForSuccessOrClose(); }, 600);
             } else if (isManual) {
-              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} filled</span><div class="sub">👆 Click ENTER when ready${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#6a8aaa');
-              completedCount++; currentIndex++; watchForSuccessOrClose();
+              showBanner(`<span style="color:#48bb78">✓ Form ${completedCount+1}/${completedCount+remaining} filled</span><div class="sub">👆 Click ENTER when ready${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#6a8aaa');
+              completedCount++; watchForSuccessOrClose();
             } else {
-              showBanner(`<span style="color:#48bb78">✓ Form ${currentIndex+1}/${buttons.length} filled</span><div class="sub">👆 Solve reCAPTCHA → click ENTER${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#48bb78');
-              completedCount++; currentIndex++; watchForSuccessOrClose();
+              showBanner(`<span style="color:#48bb78">✓ Form ${completedCount+1}/${completedCount+remaining} filled</span><div class="sub">👆 Solve reCAPTCHA → click ENTER${remaining>1?`<br>${remaining-1} more after this`:''}</div>`, '#48bb78');
+              completedCount++; watchForSuccessOrClose();
             }
           }, 1200);
         }
@@ -866,7 +866,7 @@
     if (!ud.firstName || !ud.email) return;
     const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let done = false;
-    const lsShowName = decodeURIComponent(location.hash.replace(/^#/,'').split('|')[0]) || 'Lucky Seat';
+    const lsShowName = decodeURIComponent(location.hash.replace(/^#/,'')).split('|')[0] || 'Lucky Seat';
 
     function isMorning(t) {
       const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -1020,13 +1020,12 @@
               if (btn) {
                 addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'entered', detail: result.selected + ' performance' + (result.selected !== 1 ? 's' : '') });
                 btn.click();
-                // Watch for "Review Your Selection" confirmation modal and auto-confirm
-                const confirmObs = new MutationObserver(() => {
+                // Poll for "Review Your Selection" confirmation modal and auto-confirm
+                const confirmPoll = setInterval(() => {
                   const confirmBtn = [...document.querySelectorAll('button, a')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
-                  if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
-                });
-                confirmObs.observe(document.body, { childList: true, subtree: true });
-                setTimeout(() => confirmObs.disconnect(), 10000);
+                  if (confirmBtn && confirmBtn.offsetParent !== null) { clearInterval(confirmPoll); confirmBtn.click(); }
+                }, 300);
+                setTimeout(() => clearInterval(confirmPoll), 8000);
               }
             }, 600);
           } else {
@@ -1042,12 +1041,11 @@
                     if (btn) {
                       addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'entered', detail: result.selected + ' performance' + (result.selected !== 1 ? 's' : '') });
                       btn.click();
-                      const confirmObs = new MutationObserver(() => {
+                      const confirmPoll2 = setInterval(() => {
                         const confirmBtn = [...document.querySelectorAll('button, a')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
-                        if (confirmBtn && confirmBtn.offsetParent !== null) { confirmObs.disconnect(); confirmBtn.click(); }
-                      });
-                      confirmObs.observe(document.body, { childList: true, subtree: true });
-                      setTimeout(() => confirmObs.disconnect(), 10000);
+                        if (confirmBtn && confirmBtn.offsetParent !== null) { clearInterval(confirmPoll2); confirmBtn.click(); }
+                      }, 300);
+                      setTimeout(() => clearInterval(confirmPoll2), 8000);
                     }
                   }, 400);
                 } else {
