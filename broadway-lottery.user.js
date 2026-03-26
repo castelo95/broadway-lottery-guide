@@ -757,6 +757,12 @@
     if (!ud.firstName || !ud.email) return;
     const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let filled = false;
+    let bdShowName = 'Broadway Direct';
+    try {
+      bdShowName = window.parent.document.querySelector('h1')?.textContent?.trim() ||
+                   window.parent.document.title.split(/[|\-–]/)[0].trim() ||
+                   'Broadway Direct';
+    } catch(e) {}
 
     function setSelect(el, val) {
       if (!el || !val) return false;
@@ -818,6 +824,7 @@
             document.body.appendChild(ind);
             setTimeout(() => ind.remove(), 8000);
             bdSubmit();
+            addRunLogEntry({ show: bdShowName, platform: 'Broadway Direct', status: 'entered', detail: '' });
           } else if (!isManual) {
             ind.textContent = `🎭 ✓ ${count} fields — captcha clicked, waiting...`;
             document.body.appendChild(ind);
@@ -829,14 +836,17 @@
                 ind.textContent = `🎭 ✓ ${count} fields — captcha solved, submitting...`;
                 setTimeout(() => ind.remove(), 8000);
                 bdSubmit();
+                addRunLogEntry({ show: bdShowName, platform: 'Broadway Direct', status: 'entered', detail: '' });
               } else if (Date.now() - bdPollStart > 20000) {
                 clearInterval(bdPollId);
                 ind.textContent = `🎭 ✓ ${count} fields — click "I'm not a robot" then click ENTER`;
+                addRunLogEntry({ show: bdShowName, platform: 'Broadway Direct', status: 'captcha_pending', detail: '' });
               }
             }, 500);
           } else {
             ind.textContent = `🎭 ✓ ${count} fields — click "I'm not a robot" then click ENTER`;
             document.body.appendChild(ind);
+            addRunLogEntry({ show: bdShowName, platform: 'Broadway Direct', status: 'captcha_pending', detail: '' });
             setTimeout(() => ind.remove(), 15000);
           }
         }, 1200);
