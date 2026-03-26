@@ -333,6 +333,8 @@
       #ap-overlay.on{display:block}
     `);
 
+    let renderLog = () => {};
+
     function build() {
       const shows = scrapeShows();
       const selected = new Set();
@@ -542,6 +544,10 @@
               <div class="f" style="grid-column:1/-1"><label>Date of birth</label><div class="dob"><input id="u-dmm" value="${ud.dobMM}" placeholder="MM" maxlength="2"><input id="u-ddd" value="${ud.dobDD}" placeholder="DD" maxlength="2"><input id="u-dyy" value="${ud.dobYYYY}" placeholder="YYYY" maxlength="4"></div></div>
             </div>
           </details>
+          <details class="log" id="ap-log">
+            <summary><div class="cfg-icon">📋</div><span class="cfg-label">Last Run</span><span class="log-time" id="log-time"></span></summary>
+            <div class="log-entries" id="log-entries"></div>
+          </details>
           <div class="bar">
             <button class="tag${filter==='all'?' on':''}" data-f="all">All</button>
             <button class="tag${filter==='bdirect'?' on':''}" data-f="bdirect">B.Direct</button>
@@ -649,6 +655,7 @@
           toast(`🚀 Opening ${toOpen.length} link${toOpen.length>1?'s':''}...`);
         };
         renderCalendar();
+        renderLog();
       }
 
       function renderCalendar() {
@@ -682,6 +689,32 @@
         if (count) count.textContent = available + '/14 available';
       }
 
+      renderLog = function() {
+        const entriesEl = shadow.getElementById('log-entries');
+        const timeEl = shadow.getElementById('log-time');
+        if (!entriesEl) return;
+        const log = loadRunLog();
+        if (!log || !log.entries.length) {
+          entriesEl.innerHTML = '<div class="log-empty">No runs yet.</div>';
+          if (timeEl) timeEl.textContent = '';
+          return;
+        }
+        const icons = { entered:'✅', already_entered:'⏭️', captcha_pending:'⚠️', no_match:'⏭️', error:'❌' };
+        const labels = { entered:'Entered', already_entered:'Already in', captcha_pending:'Captcha', no_match:'No match', error:'Error' };
+        if (timeEl) {
+          const d = new Date(log.runTime);
+          timeEl.textContent = 'Today ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        }
+        entriesEl.innerHTML = log.entries.map(e => `
+          <div class="log-entry">
+            <span class="log-icon">${icons[e.status]||'•'}</span>
+            <span class="log-show">${e.show}</span>
+            <span class="log-status">${labels[e.status]||e.status}</span>
+            ${e.detail?`<span class="log-detail">· ${e.detail}</span>`:''}
+          </div>
+        `).join('');
+      };
+
       render();
 
       loadShowImages(shows, (show) => {
@@ -713,6 +746,7 @@
 
     if (document.readyState === 'complete') build();
     else window.addEventListener('load', build);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) renderLog(); });
   }
 
   // ═══ BROADWAY DIRECT IFRAME ══════════════════════════════════════════
