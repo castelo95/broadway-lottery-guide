@@ -1077,6 +1077,7 @@
 
     const hashParts = location.hash ? decodeURIComponent(location.hash.slice(1)).split('|') : [];
     const targetShow = hashParts[0]?.toLowerCase().trim() || null;
+    const tcShowName = hashParts[0]?.trim() || 'Telecharge';
     const isAuto = hashParts[1] === 'auto';
     function normalize(s) { return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
     function matches(cardTitle) {
@@ -1166,11 +1167,14 @@
       setTimeout(() => {
         if (alreadyIn > 0 && entered === 0) {
           showIndicator(`Already entered — check your email for results.`, '#ecc94b');
+          addRunLogEntry({ show: tcShowName, platform: 'Telecharge', status: 'already_entered', detail: '' });
         } else if (entered > 0) {
           if (isAuto) {
             showIndicator(`✓ Entered ${entered} lotter${entered>1?'ies':'y'} automatically.`, '#48bb78');
+            addRunLogEntry({ show: tcShowName, platform: 'Telecharge', status: 'entered', detail: entered + ' lotter' + (entered > 1 ? 'ies' : 'y') });
           } else {
             showIndicator(`✓ Form ready — click <b style="color:#fff">Enter</b> when you're ready.`, '#6a8aaa');
+            addRunLogEntry({ show: tcShowName, platform: 'Telecharge', status: 'entered', detail: entered + ' lotter' + (entered > 1 ? 'ies' : 'y') });
           }
         }
       }, targetCards.length * 600 + 200);
