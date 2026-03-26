@@ -638,6 +638,7 @@
           const ud2 = loadUser();
           if (!ud2.firstName || !ud2.email) { toast('⚠️ Fill in your name and email'); return; }
           if (!ud2.dobMM || !ud2.dobDD || !ud2.dobYYYY) { toast('⚠️ Fill in your date of birth'); return; }
+          saveRunLog({ runTime: new Date().toISOString(), entries: [] });
           const toOpen = []; const seen = new Set();
           active.forEach(show => { show.links.forEach(link => { if (!seen.has(link.url + show.name)) { seen.add(link.url + show.name); toOpen.push({...link, showName: show.name, isAuto: globalAuto}); } }); });
           if (!toOpen.length) { toast('⚠️ No lottery links found'); return; }
