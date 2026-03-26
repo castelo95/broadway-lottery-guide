@@ -386,6 +386,20 @@
         .day-chip{font-size:10px;padding:2px 7px;border-radius:3px;cursor:pointer;border:1px solid rgba(201,151,58,.15);background:#111009;color:#3a3020;transition:all .15s;user-select:none}
         .day-chip.avail{color:#c9973a;border-color:rgba(201,151,58,.5);background:#1a1610}
         .day-chip.today{font-weight:700}
+        details.log{border-bottom:1px solid #1a1610;flex-shrink:0}
+        details.log summary{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer;list-style:none;user-select:none}
+        details.log summary:hover{background:#111009}
+        details.log summary::after{content:'▸';margin-left:auto;color:#2a2018;font-size:9px;transition:transform .2s}
+        details.log[open] summary::after{transform:rotate(90deg)}
+        .log-time{font-size:9px;color:#4a4030;letter-spacing:.5px}
+        .log-entries{padding:4px 20px 12px;display:flex;flex-direction:column;gap:4px}
+        .log-entry{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 0;border-bottom:1px solid #1a1610}
+        .log-entry:last-child{border-bottom:none}
+        .log-icon{font-size:13px;flex-shrink:0}
+        .log-show{color:#c9973a;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .log-status{font-size:10px;color:#4a4030;flex-shrink:0}
+        .log-detail{font-size:10px;color:#3a3020;flex-shrink:0}
+        .log-empty{font-size:11px;color:#3a3020;padding:8px 0}
         .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:4px 20px 14px}
         .f label{display:block;font-size:8px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#3a3020;margin-bottom:4px}
         .f input,.f select{width:100%;padding:7px 10px;border-radius:2px;border:1px solid #1e1a14;background:#0b0906;color:#c8b89a;font-size:12px;font-family:'Space Grotesk',sans-serif;outline:none}
