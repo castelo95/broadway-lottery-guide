@@ -856,6 +856,7 @@
     if (!ud.firstName || !ud.email) return;
     const isManual = GM_getValue('ap_auto_mode', '1') !== '1';
     let done = false;
+    const lsShowName = decodeURIComponent(location.hash.replace(/^#/,'').split('|')[0]) || 'Lucky Seat';
 
     function isMorning(t) {
       const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -981,14 +982,17 @@
             `<span style="font-size:12px;opacity:.8">Nothing left to do here — check your email for results.</span>`,
             '#ecc94b'
           );
+          addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'already_entered', detail: '' });
         } else if (result.status === 'no_match') {
           showIndicator(
             `⚠️ No ${filterLabel} performances available for this show.<br>` +
             `<span style="font-size:12px;opacity:.8">Try changing your time filter in the bwayrush.com panel.</span>`,
             '#ecc94b'
           );
+          addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'no_match', detail: '' });
         } else {
           showIndicator('⚠️ No open performances found — all may be Closed or already entered.', '#e53e3e');
+          addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'no_match', detail: '' });
         }
         return;
       }
@@ -998,11 +1002,13 @@
         setTimeout(() => {
           if (isManual) {
             showIndicator('✓ Performances selected & tickets set — click <b style="color:#fff">Submit Entry</b> when ready', '#6a8aaa');
+            addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'captcha_pending', detail: '' });
           } else if (!hasPendingCaptcha()) {
             showIndicator('✓ All done — submitting automatically...', '#48bb78');
             setTimeout(() => {
               const btn = document.querySelector('button.c-btn--large, button[type="submit"]');
               if (btn) {
+                addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'entered', detail: result.selected + ' performance' + (result.selected !== 1 ? 's' : '') });
                 btn.click();
                 // Watch for "Review Your Selection" confirmation modal and auto-confirm
                 const confirmObs = new MutationObserver(() => {
@@ -1024,6 +1030,7 @@
                   setTimeout(() => {
                     const btn = document.querySelector('button.c-btn--large, button[type="submit"]');
                     if (btn) {
+                      addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'entered', detail: result.selected + ' performance' + (result.selected !== 1 ? 's' : '') });
                       btn.click();
                       const confirmObs = new MutationObserver(() => {
                         const confirmBtn = [...document.querySelectorAll('button, a')].find(b => /confirm\s*&?\s*submit/i.test(b.textContent));
@@ -1039,6 +1046,7 @@
               } else if (Date.now() - pollStart > 20000) {
                 clearInterval(pollId);
                 showIndicator('✓ Performances selected & tickets set — click "I\'m not a robot" then <b style="color:#fff">Submit Entry</b>', '#ecc94b');
+                addRunLogEntry({ show: lsShowName, platform: 'Lucky Seat', status: 'captcha_pending', detail: '' });
               }
             }, 500);
           }
